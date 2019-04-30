@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package com.insalyon.videostream;
+import com.google.gson.Gson;
 import java.util.logging.Logger;
  
 import javax.websocket.CloseReason;
@@ -11,13 +12,13 @@ import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerEndpoint;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import javax.json.JsonObject;
 import javax.websocket.EncodeException;
 import javax.websocket.server.PathParam;
 /**
@@ -37,7 +38,7 @@ public class ServerEndPoint {
         logger.info("Connected ... " + session.getId());
         this.session = session;
         this.roomNumber = roomNumber;
-        if (usertype.equals("Start")) {
+        if (usertype.equals("start")) {
             serverEndPoints.put(roomNumber, new CopyOnWriteArraySet<ServerEndPoint> ());
         }
         else {
@@ -47,16 +48,25 @@ public class ServerEndPoint {
  
     @OnMessage
     public String onMessage(String message, Session session) throws IOException, EncodeException {
-        switch (message) {
-        case "quit":
-            try {
-                session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, "Streaming ended"));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        JsonObject json = new Gson().fromJson(message, JsonObject.class);
+        if (json != null) {
+            String userType = json.getString("user");
+            String type = json.getString("type");
+            if ("bye".equals(type)) {
+                System.out.println("user :" + session.getId() + " " + userType + " exit..");
+                if(userType.equals("start")){
+                    serverEndPoints.remove(roomNumber);
+                }else{
+                    serverEndPoints.get(roomNumber).remove(this);
+                }
+            }else if ("offer".equals(type)){
+                if(userType.equals("start")){
+                    broadcast(message);
+                }else{
+                    System.err.println("Wrong userType sent offer ");
+                }
             }
-            break;
         }
-        broadcast(message);
         return message;
     }
  

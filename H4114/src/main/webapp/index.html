@@ -12,6 +12,7 @@
         <button id="start">Start</button>
         <button id="snap">Snap Photo</button>
         <button id="stream">Start Live Streaming</button>
+        <button id="listen">Listen</button>
         <canvas id="canvas" width="640" height="480"></canvas>
         
         <div id="errorMsg"></div>
@@ -20,6 +21,10 @@
             $('#start').on('click', function () {
                 start();
                 console.log('Camera started');
+            });
+            $('#stream').on('click', function () {
+                stream();
+                console.log('Stream started');
             });
         </script>
     </body>
