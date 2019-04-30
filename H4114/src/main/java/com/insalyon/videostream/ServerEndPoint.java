@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package com.insalyon.videostream;
-import com.sun.xml.internal.ws.wsdl.writer.document.Message;
 import java.util.logging.Logger;
  
 import javax.websocket.CloseReason;
@@ -29,6 +28,7 @@ import javax.websocket.server.PathParam;
 @ServerEndpoint(value = "/video/{room}/{usertype}")
 public class ServerEndPoint {
     private Session session;
+    private String roomNumber;
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private static HashMap<String, Set<ServerEndPoint> > serverEndPoints = new HashMap<String, Set<ServerEndPoint> >();
  
@@ -36,6 +36,7 @@ public class ServerEndPoint {
     public void onOpen(Session session, @PathParam("usertype") String usertype, @PathParam("room") String roomNumber) throws IOException {
         logger.info("Connected ... " + session.getId());
         this.session = session;
+        this.roomNumber = roomNumber;
         if (usertype.equals("Start")) {
             serverEndPoints.put(roomNumber, new CopyOnWriteArraySet<ServerEndPoint> ());
         }
@@ -45,7 +46,7 @@ public class ServerEndPoint {
     }
  
     @OnMessage
-    public String onMessage(String message, Session session) {
+    public String onMessage(String message, Session session) throws IOException, EncodeException {
         switch (message) {
         case "quit":
             try {
@@ -55,6 +56,7 @@ public class ServerEndPoint {
             }
             break;
         }
+        broadcast(message);
         return message;
     }
  
@@ -63,17 +65,15 @@ public class ServerEndPoint {
         logger.info(String.format("Session %s closed because of %s", session.getId(), closeReason));
     }
     
-    private static void broadcast(Message message, String roomNumber) throws IOException, EncodeException {
-  
-        for(ServerEndPoint endpoint : serverEndPoints)
+    private void broadcast(String message) throws IOException, EncodeException {
+        for(ServerEndPoint endpoint : serverEndPoints.get(this.roomNumber)) {
             synchronized (endpoint) {
                 try {
-                    endpoint.session.getBasicRemote().
-                      sendObject(message);
+                    endpoint.session.getBasicRemote().sendObject(message);
                 } catch (IOException | EncodeException e) {
                     e.printStackTrace();
                 }
             }
-        });
+        }
     }
 }
