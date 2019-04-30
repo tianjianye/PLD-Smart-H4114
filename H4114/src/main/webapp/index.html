@@ -14,9 +14,12 @@
         <button id="stream">Start Live Streaming</button>
         <canvas id="canvas" width="640" height="480"></canvas>
         
+        <div id="errorMsg"></div>
+        
         <script>
             $('#start').on('click', function () {
                 start();
+                console.log('Camera started');
             });
         </script>
     </body>
