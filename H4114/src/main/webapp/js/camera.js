@@ -8,7 +8,8 @@ var socket;
 var localStream;
 var started = false;
 var pc;
-const configuration = {iceServers: [{urls: 'stuns:stun.l.googke.com:19302'}]};
+
+const configuration = {iceServers: [{urls: 'stun:stun.l.googke.com:19302'}]};
 const constraints = window.constraints = {
   audio: false,
   video: true
@@ -26,7 +27,6 @@ function start(){
             video.srcObject = stream;
             localStream = stream;
             video.play();
-            started = true;
         })
         .catch(function(error) {
             /* handle the error */
@@ -41,23 +41,16 @@ function start(){
             errorMsg(`getUserMedia error: ${error.name}`, error);
         });
     }
-    if (!started && localStream) {
-        console.log("Creating PeerConnection.");
-        pc = new RTCPeerConnection(configuration);
-        console.log("Adding local stream.");
-        pc.addStream(localStream);
-        started = true;
-        // Caller initiates offer to peer.
-        console.log("Sending offer to peer.");
-        var offer = pc.createOffer(constraints);
-        pc.setLocalDescription(pc.SDP_OFFER, offer);
-        sendMessage({
-            user : 'start',
-            type : 'offer',
-            sdp : offer.toSdp()
-        });
-        pc.startIce();
-    }
+}
+
+function stop() {
+    const video = document.getElementById('video');
+    video.pause();
+    video.srcObject = null;
+    video.src = "";
+    localStream.getTracks().forEach(function(track) {
+        track.stop();
+    });
 }
 
 function setLocalAndSendMessage(sessionDescription) {
@@ -73,18 +66,26 @@ function errorMsg(msg, error) {
     }
 }
 
-function stream(){
-    socket = new WebSocket("ws://127.0.0.1:8084/video/10/start");
+function connectStart(){
+    socket = new WebSocket("ws://localhost:8084/H4114/video/10/start");
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
+        const video = document.getElementById('video');
+        const video2 = document.getElementById('video2');
+        video2.srcObject = video.srcObject;
+        console.log(video2.srcObject);
+        console.log(video.srcObject);
     };
     socket.onerror = function (event) {
         console.log(event);
     };
     socket.onmessage = function (event) {
-        if (event.data instanceof ArrayBuffer) {
-        } else {
-           $('#affiche').html(event.data);
+        console.log(event.data);
+        var json = JSON.parse(event.data);
+        if(json.type === 'answer') {
+            console.log(json.sdp);
+            var desc = new RTCSessionDescription(json.sdp);
+            pc.setRemoteDescription(desc);
         }
     };
     socket.onclose = function (event) {
@@ -94,6 +95,143 @@ function stream(){
         });
         console.log("/!\\ Déconnexion serveur");
     };
+}
+
+function stream(){
+    if (!started && localStream) {
+        console.log("Creating PeerConnection.");
+        createPeerConnection();
+        console.log("Adding local stream.");
+        console.log(localStream);
+        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+        started = true;
+    }
+}
+
+
+function connectListen(){
+    socket = new WebSocket("ws://localhost:8084/H4114/video/10/listen");
+    socket.onopen = function (event) {
+        console.log("/!\\ Connexion serveur");
+    };
+    socket.onerror = function (event) {
+        console.log(event);
+    };
+    socket.onmessage = function (event) {
+        console.log(event.data);
+        var json = JSON.parse(event.data);
+        if(json.type === 'candidate') {
+            var candidate = new RTCIceCandidate(json.candidate);
+            pc.addIceCandidate(candidate);
+        }else if(json.type === 'offer') {
+            console.log(json.sdp);
+            handleVideoOfferMsg(json);
+        }
+    };
+    socket.onclose = function (event) {
+        sendMessage({
+            user : 'start',
+            type : 'bye'
+        });
+        console.log("/!\\ Déconnexion serveur");
+    };
+}
+
+function handleVideoOfferMsg(msg) {
+    createPeerConnection();
+    var desc = new RTCSessionDescription(msg.sdp);
+
+    pc.setRemoteDescription(desc).then(function() {
+        return pc.createAnswer();
+    })
+    .then(function(answer) {
+        return pc.setLocalDescription(answer);
+    })
+    .then(function() {
+        var msg = {
+            user: "listen",
+            type: "answer",
+            sdp: pc.localDescription
+        }; 
+        sendMessage(msg);
+    });
+}
+
+
+function createPeerConnection() {
+    pc = new RTCPeerConnection(configuration);
+
+    pc.onicecandidate = handleICECandidateEvent;
+    pc.ontrack = handleTrackEvent;
+    pc.onnegotiationneeded = handleNegotiationNeededEvent;
+    pc.onremovetrack = handleRemoveTrackEvent;
+    pc.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
+    pc.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
+    pc.onsignalingstatechange = handleSignalingStateChangeEvent;
+}
+
+function handleNegotiationNeededEvent() {
+    console.log("Sending offer to peer.");
+    pc.createOffer().then(function(offer) {
+        return pc.setLocalDescription(offer);
+    })
+    .then(function() {
+        sendMessage({
+            user : 'start',
+            type : 'offer',
+            sdp : pc.localDescription
+        });
+    });
+}
+
+function handleICECandidateEvent(event) {
+    if (event.candidate) {
+        sendMessage({
+            user : "start",
+            type: "candidate",
+            candidate: event.candidate
+        });
+    }
+}
+
+function handleICEConnectionStateChangeEvent(event) {
+  log("*** ICE connection state changed to " + pc.iceConnectionState);
+
+  switch(pc.iceConnectionState) {
+    case "closed":
+    case "failed":
+    case "disconnected":
+      break;
+  }
+}
+
+function handleSignalingStateChangeEvent(event) {
+    console.log("*** WebRTC signaling state changed to: " + pc.signalingState);
+    switch(pc.signalingState) {
+        case "closed":
+            break;
+    }
+}
+
+function handleICEGatheringStateChangeEvent(event) {
+    console.log("*** ICE gathering state changed to: " + pc.iceGatheringState);
+}
+
+function handleTrackEvent(event) {
+    const video = document.getElementById('video');
+    console.log("ashoidiasipdfsapfopapasfjasfpasfopaspasfoafjoaspfosajasajsfajsfopasjfodjapsdjopasjdpoj");
+    video.srcObject = event.streams[0];
+    console.log(event.streams.length);
+    console.log(document.getElementById("video").srcObject);
+}
+
+function handleRemoveTrackEvent(event) {
+    var stream = document.getElementById("videoDest").srcObject;
+    var trackList = stream.getTracks();
+
+    if (trackList.length === 0) {
+        closeVideoCall();
+    }
 }
 
 function sendMessage(message){

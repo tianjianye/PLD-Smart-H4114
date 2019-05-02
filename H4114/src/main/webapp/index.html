@@ -10,10 +10,11 @@
         <h1>Hello a!</h1>
         <video id="video" width="640" height="480" autoplay></video>
         <button id="start">Start</button>
-        <button id="snap">Snap Photo</button>
-        <button id="stream">Start Live Streaming</button>
-        <button id="listen">Listen</button>
-        <canvas id="canvas" width="640" height="480"></canvas>
+        <button id="stop">Stop</button>
+        <button id="connect">Connect Start</button>
+        <button id="connect2">Connect Listen</button>
+        <button id="stream">Start Stream</button>
+        <video id="video2" width="640" height="480" autoplay></video>
         
         <div id="errorMsg"></div>
         
@@ -21,6 +22,18 @@
             $('#start').on('click', function () {
                 start();
                 console.log('Camera started');
+            });
+            $('#stop').on('click', function () {
+                stop();
+                console.log('Camera stopped');
+            });
+            $('#connect').on('click', function () {
+                connectStart();
+                console.log('Stream started');
+            });
+            $('#connect2').on('click', function () {
+                connectListen();
+                console.log('Stream started');
             });
             $('#stream').on('click', function () {
                 stream();
