@@ -70,11 +70,6 @@ function connectStart(){
     socket = new WebSocket("ws://localhost:8084/H4114/video/10/start");
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
-        const video = document.getElementById('video');
-        const video2 = document.getElementById('video2');
-        video2.srcObject = video.srcObject;
-        console.log(video2.srcObject);
-        console.log(video.srcObject);
     };
     socket.onerror = function (event) {
         console.log(event);
