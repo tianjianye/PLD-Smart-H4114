@@ -5,7 +5,6 @@ package com.insalyon.videostream;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -50,7 +49,7 @@ public class ActionServlet extends HttpServlet {
                 HashMap<String, Boolean> rooms = ServerEndPoint.getServerEndPointState();
                 JsonArray jsonListe = new JsonArray();
                 for (Map.Entry<String, Boolean> entry : rooms.entrySet()) {
-                    if(Objects.equals(entry.getValue(), Boolean.FALSE)){
+                    if (Objects.equals(entry.getValue(), Boolean.FALSE)) {
                         JsonObject json = new JsonObject();
                         json.addProperty("num", entry.getKey());
                         jsonListe.add(json);
@@ -59,27 +58,24 @@ public class ActionServlet extends HttpServlet {
                 jsonResponse.add("rooms", jsonListe);
                 out.println(gson.toJson(jsonResponse));
                 out.close();
-            } else if(action.equals("create")){
-                
-            } else if(action.equals("join")){
-                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            } else if (action.equals("create")) {
+
+            } else if (action.equals("join")) {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 JsonObject jsonResponse = new JsonObject();
                 HashMap<String, Boolean> rooms = ServerEndPoint.getServerEndPointState();
                 String number = request.getParameter("number");
-                if(Objects.equals(rooms.get(number), Boolean.FALSE)){
-                        jsonResponse.addProperty("join", "true");
-                }else{
+                if (Objects.equals(rooms.get(number), Boolean.FALSE)) {
+                    jsonResponse.addProperty("join", "true");
+                } else {
                     jsonResponse.addProperty("join", "false");
                 }
                 out.println(gson.toJson(jsonResponse));
                 out.close();
             }
+            
         }
     }
-    
-    
-
-
 
     /*public static void printListePersonnes(PrintWriter out, List<Service.Personne> personnes) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -150,5 +146,4 @@ public class ActionServlet extends HttpServlet {
         jsonPersonne.addProperty("dateNaissance", p.getDateNaissance().toString());
         out.println(gson.toJson(jsonPersonne));
     }*/
-   
 }

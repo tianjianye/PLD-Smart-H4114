@@ -8,7 +8,6 @@
 
 package com.insalyon.votewithbchain;
 
-import com.insalyon.blockchain.Block;
 import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -18,8 +17,6 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.util.Pair;
-import static com.insalyon.votewithbchain.VoteWithBChain.blockchain;
 
 /**
  *

@@ -8,7 +8,6 @@ package com.insalyon.votewithbchain;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import com.insalyon.blockchain.Block;
 import java.io.PrintStream;
 import java.util.ArrayList;
 

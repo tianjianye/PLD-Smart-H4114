@@ -112,6 +112,21 @@ public class ActionServlet extends HttpServlet {
                     Logger.getLogger(ActionServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+                
+            case "createPoll":
+             
+                    String question=(String)request.getParameter("question");
+                    String [] responses = request.getParameterValues("responses");
+                    String time =(String)request.getParameter("time");
+                    String place  =(String)request.getParameter("place");
+               
+               
+                
+            break;
+            case"answerePoll":
+            break;
+            case"contestPoll":
+            break;
             default:
             }
     }
