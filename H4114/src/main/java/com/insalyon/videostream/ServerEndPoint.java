@@ -78,6 +78,12 @@ public class ServerEndPoint {
                 }else{
                     System.err.println("Wrong userType sent answer ");
                 }
+            }else if ("test".equals(type)){
+                if(userType.equals("listen")){
+                    sendToStart(message);
+                }else{
+                    System.err.println("Wrong userType sent answer ");
+                }
             }
         }
         return message;

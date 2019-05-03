@@ -60,14 +60,14 @@ function setLocalAndSendMessage(sessionDescription) {
 
 function errorMsg(msg, error) {
     const errorElement = document.querySelector('#errorMsg');
-    errorElement.innerHTML = `<p>${msg}</p>`;
+    errorElement.innerHTML += `<p>${msg}</p>`;
     if (typeof error !== 'undefined') {
       console.error(error);
     }
 }
 
 function connectStart(){
-    socket = new WebSocket("ws://localhost:8084/H4114/video/10/start");
+    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/10/start");
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
     };
@@ -105,14 +105,19 @@ function stream(){
 
 
 function connectListen(){
-    socket = new WebSocket("ws://localhost:8084/H4114/video/10/listen");
+    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/10/listen");
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
+        sendMessage({
+            user : 'listen',
+            type : 'test'
+        });
     };
     socket.onerror = function (event) {
         console.log(event);
     };
     socket.onmessage = function (event) {
+        errorMsg(event.data);
         console.log(event.data);
         var json = JSON.parse(event.data);
         if(json.type === 'candidate') {
@@ -133,28 +138,37 @@ function connectListen(){
 }
 
 function handleVideoOfferMsg(msg) {
+    errorMsg("handleVideoOfferMsg");
     createPeerConnection();
+    errorMsg("handleVideoOfferMsg2");
     var desc = new RTCSessionDescription(msg.sdp);
+    errorMsg("handleVideoOfferMsg4");
 
     pc.setRemoteDescription(desc).then(function() {
         return pc.createAnswer();
+        errorMsg("handleVideoOfferMsg5");
     })
     .then(function(answer) {
         return pc.setLocalDescription(answer);
     })
     .then(function() {
+        errorMsg("handleVideoOfferMsg3");
         var msg = {
             user: "listen",
             type: "answer",
             sdp: pc.localDescription
         }; 
+        errorMsg(msg);
         sendMessage(msg);
     });
 }
 
 
 function createPeerConnection() {
+    errorMsg("createPeerConnection");
+    errorMsg(configuration);
     pc = new RTCPeerConnection(configuration);
+    errorMsg("createPeerConnection2");
 
     pc.onicecandidate = handleICECandidateEvent;
     pc.ontrack = handleTrackEvent;
@@ -190,14 +204,14 @@ function handleICECandidateEvent(event) {
 }
 
 function handleICEConnectionStateChangeEvent(event) {
-  log("*** ICE connection state changed to " + pc.iceConnectionState);
+    console.log("*** ICE connection state changed to " + pc.iceConnectionState);
 
-  switch(pc.iceConnectionState) {
-    case "closed":
-    case "failed":
-    case "disconnected":
-      break;
-  }
+    switch(pc.iceConnectionState) {
+        case "closed":
+        case "failed":
+        case "disconnected":
+            break;
+    }
 }
 
 function handleSignalingStateChangeEvent(event) {
@@ -215,9 +229,11 @@ function handleICEGatheringStateChangeEvent(event) {
 function handleTrackEvent(event) {
     const video = document.getElementById('video');
     console.log("ashoidiasipdfsapfopapasfjasfpasfopaspasfoafjoaspfosajasajsfajsfopasjfodjapsdjopasjdpoj");
+    errorMsg("ashoidiasipdfsapfopapasfjasfpasfopaspasfoafjoaspfosajasajsfajsfopasjfodjapsdjopasjdpoj");
     video.srcObject = event.streams[0];
     console.log(event.streams.length);
     console.log(document.getElementById("video").srcObject);
+    errorMsg(document.getElementById("video").srcObject.id);
 }
 
 function handleRemoveTrackEvent(event) {
