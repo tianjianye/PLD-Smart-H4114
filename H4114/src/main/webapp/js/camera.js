@@ -11,7 +11,8 @@ var pc;
 
 
 
-const configuration = {iceServers: [{urls: 'stun:stun.l.googke.com:19302'}]};
+const configuration = {iceServers: [/*{urls: 'stun:stun.l.googke.com:19302'}*/{urls: 'turn:10.43.6.50:3478',credential: 'test',
+    username: 'test'}]};
 const constraints = window.constraints = {
   audio: false,
   video: true
@@ -69,7 +70,7 @@ function errorMsg(msg, error) {
 }
 
 function connectStart(){
-    socket = new WebSocket("ws://localhost:8084/H4114/video/10/start");
+    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/10/start");
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
     };
@@ -107,7 +108,7 @@ function stream(){
 
 
 function connectListen(){
-    socket = new WebSocket("ws://localhost:8084/H4114/video/10/listen");
+    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/10/listen");
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
     };
