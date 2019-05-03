@@ -31,6 +31,16 @@ public class ServerEndPoint {
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private static HashMap<String, Set<ServerEndPoint> > serverEndPoints = new HashMap<String, Set<ServerEndPoint> >();
     private static HashMap<String, ServerEndPoint> serverEndPointStart = new HashMap<String, ServerEndPoint>();
+    private static HashMap<String, Boolean> serverEndPointState = new HashMap<String, Boolean>();
+    private static HashMap<String, String> serverEndPointRoomKey = new HashMap<String, String>();
+    
+    public static HashMap<String, Boolean> getServerEndPointState(){
+        return serverEndPointState;
+    }
+    
+    public static HashMap<String, String> getServerEndPointRoomKey(){
+        return serverEndPointRoomKey;
+    }
  
     @OnOpen
     public void onOpen(Session session, @PathParam("usertype") String usertype, @PathParam("room") String roomNumber) throws IOException {
@@ -41,9 +51,14 @@ public class ServerEndPoint {
         if (usertype.equals("start")) {
             serverEndPoints.put(roomNumber, new CopyOnWriteArraySet<ServerEndPoint> ());
             serverEndPointStart.put(roomNumber, this);
+            serverEndPointState.put(roomNumber, Boolean.FALSE);
         }
         else {
-            serverEndPoints.get(roomNumber).add(this);
+            if(serverEndPoints.get(roomNumber).size() < 1){
+                serverEndPoints.get(roomNumber).add(this);
+                serverEndPointState.replace(roomNumber, Boolean.TRUE);
+            }
+            
         }
     }
  
@@ -57,8 +72,10 @@ public class ServerEndPoint {
                 System.out.println("user :" + session.getId() + " " + userType + " exit..");
                 if(userType.equals("start")){
                     serverEndPoints.remove(roomNumber);
+                    serverEndPointState.remove(roomNumber);
                 }else{
                     serverEndPoints.get(roomNumber).remove(this);
+                    serverEndPointState.replace(roomNumber, Boolean.FALSE);
                 }
             }else if ("offer".equals(type)){
                 if(userType.equals("start")){
@@ -75,12 +92,6 @@ public class ServerEndPoint {
             }else if ("candidate".equals(type)){
                 if(userType.equals("start")){
                     broadcast(message);
-                }else{
-                    System.err.println("Wrong userType sent answer ");
-                }
-            }else if ("test".equals(type)){
-                if(userType.equals("listen")){
-                    sendToStart(message);
                 }else{
                     System.err.println("Wrong userType sent answer ");
                 }
