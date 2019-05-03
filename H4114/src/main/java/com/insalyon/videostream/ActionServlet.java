@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author pacabrera
  */
-@WebServlet(urlPatterns = {"/ActionServlet"})
+@WebServlet(urlPatterns = {"/ActionServlet2"})
 public class ActionServlet extends HttpServlet {
 
     /**
