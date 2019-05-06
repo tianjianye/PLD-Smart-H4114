@@ -17,7 +17,7 @@ function changeToView() {
 function changeToStream() {
     document.getElementsByClassName("active")[0].classList.remove("active");
     document.getElementById("stream").classList.add("active");
-    $('#content').load("stream.html");
+    $('#content').load("stream1.html");
 }
 
 function changeToVote() {

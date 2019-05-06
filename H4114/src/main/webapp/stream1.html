@@ -1,31 +1,138 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Start Page</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script type="text/javascript" src="./js/camera.js"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    </head>
-    <body>
-        <h1>Hello a toi!</h1>
-        <video id="video" width="640" height="480" autoplay></video>
-        <button id="start">Start</button>
-        <button id="snap">Snap Photo</button>
-        <button id="stream">Start Live Streaming</button>
-        <button id="listen">Listen</button>
-        <canvas id="canvas" width="640" height="480"></canvas>
-        
-        <div id="errorMsg"></div>
-        
-        <script>
+<script type="text/javascript" src="./js/caller.js"></script>
+<script type="text/javascript" src="./js/receiver.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<h1 id="displayName">Hello a toi!</h1>
+<input type="text" id="name" placeholder="Name"/>
+<button id="recordName">Log</button>
+<button id="createRoom">Create room</button>
+<button id="refresh">Refresh</button>
+<button id="stop">Stop</button>
+<table id="freeRoom">
+    <thead>
+        <tr><td>Room number</td><td>Number of persons</td><td>Join this room</td></tr>
+    </thead>
+    <tbody id="tableBody">
+    </tbody>
+</table>
+
+<video id="video" width="320" height="240" autoplay></video>
+<button id="start">Start</button>
+
+<div id="errorMsg"></div>
+
+<script>
+    var name = '';
+    function recordName(){
+        var champNom = $('#name').val();
+        name = champNom;
+        $("#displayName").html("Welcome "+champNom);
+    }
+
+    function joinRoom(number){
+       connectListen(number, name);
+    }
+
+    function startRoom(){
+        var roomNumber;
+         $.ajax({
+            url: './ActionServlet2',
+            method: 'POST',
+            data: {
+                action : 'create'
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            var response = data;
+            roomNumber = response.index;
+            console.log(roomNumber);
+            connectStart(roomNumber);
+        });
+    }
+
+    function getRoomInfos(rooms){
+        clearInfos();
+        var RoomHTML = $('#tableBody');
+        if(rooms.length === 0){
+            var strNull = '<td colspan="3">There is no room yet.</td>';
+             RoomHTML.append(strNull);
+        }else{
+            var i = 0;
+            var str = '';
+            for(i = 0; i<rooms.length; i++){
+                var element = rooms[i];
+                console.log(element);
+                var numRoom = element["num"];
+                var numPersons = element["person"];
+                str = '<tr>';
+                str = str + '<td>'+ numRoom + '</td>';
+                str = str + '<td>' + numPersons + '</td>';
+                str = str + '<td><button type="button" class="btn btn-outline-primary" onClick="joinRoom(' + numRoom + ')"' + ' value="' + numRoom +'" >Join</button></td>';
+                str = str + '</tr>';
+            }
+            RoomHTML.append(str);
+        }
+    }
+
+    function clearInfos(){
+        $("#tableBody").html("");
+    }
+
+    function refreshInfos(){
+         $.ajax({
+            url: './ActionServlet2',
+            method: 'POST',
+            data: {
+                action : 'room'
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            // ici votre code...
+            // 
+            // si connexion ok, aller sur la page suivante :
+            //$('#message').html('<b> bonjour </b>');
+            var response = data;
+            var chambers = response.rooms;
+            console.log(chambers);
+            getRoomInfos(chambers);
+        });
+    }
+
+
+    $(document).ready(function () {
+        $.ajax({
+            url: './ActionServlet2',
+            method: 'POST',
+            data: {
+                action : 'room'
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            // ici votre code...
+            // 
+            // si connexion ok, aller sur la page suivante :
+            //$('#message').html('<b> bonjour </b>');
+            var response = data;
+            console.log(response);
+            var chambers = response.rooms;
+            getRoomInfos(chambers);
+            $('#recordName').on('click', function () {
+                recordName();
+            });
+            $('#createRoom').on('click', function () {
+                startRoom();
+            });
+            $('#refresh').on('click', function () {
+                refreshInfos();
+            });
             $('#start').on('click', function () {
                 start();
                 console.log('Camera started');
             });
-            $('#stream').on('click', function () {
-                stream();
-                console.log('Stream started');
+            $('#stop').on('click', function () {
+                stop();
+                console.log('Camera stopped');
             });
-        </script>
-    </body>
-</html>
+        });
+    });
+
+</script>
