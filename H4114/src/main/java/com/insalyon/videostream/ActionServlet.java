@@ -42,7 +42,6 @@ public class ActionServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            System.out.println("processing");
 
             String action = request.getParameter("action");
             if (action.equals("room")) {
@@ -62,7 +61,6 @@ public class ActionServlet extends HttpServlet {
                     }
                 }
                 jsonResponse.add("rooms", jsonListe);
-                System.out.println(gson.toJson(jsonResponse));
                 out.println(gson.toJson(jsonResponse));
                 out.close();
             } else if(action.equals("create")){

@@ -41,6 +41,7 @@ function connectListen(number, name){
         if(json.type === 'candidate') {
             var candidate = new RTCIceCandidate(json.candidate);
             pcListen.addIceCandidate(candidate);
+            console.log(candidate);
         }else if(json.type === 'offer') {
             console.log(json.sdp);
             handleVideoOfferMsg(json);
@@ -108,8 +109,9 @@ function handleNegotiationNeededEventListen() {
 function handleICECandidateEventListen(event) {
     if (event.candidate) {
         sendMessageListen({
-            user : "start",
+            user : "listen",
             type: "candidate",
+            name : listenName,
             candidate: event.candidate
         });
     }

@@ -115,12 +115,13 @@ public class ServerEndPoint {
                     System.err.println("Wrong userType sent answer ");
                 }
             }else if ("candidate".equals(type)){
+                System.out.println(json);
                 if(userType.equals("start")){
                     String dest = json.getString("name");
                     sendToDest(message,dest);
                     //broadcast(message);
                 }else{
-                    System.err.println("Wrong userType sent answer ");
+                    sendToStart(message);
                 }
             }else if ("alive".equals(type)){
                 System.out.println(session.getId()+" is alive.");

@@ -96,7 +96,6 @@ function connectStart(number){
             listeners.push({name:json.name,index:mypos});
             createPeerConnection(mypos,json.name);
             console.log("Adding local stream.");
-            localStream.getTracks().forEach(track => pcs[mypos].addTrack(track, localStream));
             index = index + 1;
         }
     };
@@ -113,9 +112,10 @@ function createPeerConnection(pos,userName) {
     errorMsg("createPeerConnection");
     errorMsg(configuration);
     pcs[pos] = new RTCPeerConnection(configuration);
+    localStream.getTracks().forEach(track => pcs[pos].addTrack(track, localStream));
     errorMsg("createPeerConnection2");
 
-    pcs[pos].onicecandidate = handleICECandidateEvent;
+    pcs[pos].onicecandidate = handleICECandidateEvent(userName);
     pcs[pos].ontrack = handleTrackEvent;
     pcs[pos].onnegotiationneeded = handleNegotiationNeededEvent(pcs[pos],userName);
     pcs[pos].onremovetrack = handleRemoveTrackEvent;
@@ -130,6 +130,7 @@ function handleNegotiationNeededEvent(peer,userName) {
         return peer.setLocalDescription(offer);
     })
     .then(function() {
+        console.log(peer.localDescription);
         sendMessage({
             user : 'start',
             type : 'offer',
@@ -139,11 +140,12 @@ function handleNegotiationNeededEvent(peer,userName) {
     });
 }
 
-function handleICECandidateEvent(event) {
+function handleICECandidateEvent(userName) {
     if (event.candidate) {
         sendMessage({
             user : "start",
-            type: "candidate",
+            type : "candidate",
+            name : userName,
             candidate: event.candidate
         });
     }
