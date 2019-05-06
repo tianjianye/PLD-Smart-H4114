@@ -13,7 +13,7 @@ var index = 0;
 
 
 
-const configuration = {iceServers: [/*{urls: 'stun:stun.l.googke.com:19302'}*/{urls: 'turn:10.43.7.214:3478',credential: 'test',
+const configuration = {iceServers: [{urls: 'turn:10.43.7.214:3478',credential: 'test',
     username: 'test'}]};
 const constraints = window.constraints = {
   audio: false,
@@ -97,6 +97,17 @@ function connectStart(number){
             createPeerConnection(mypos,json.name);
             console.log("Adding local stream.");
             index = index + 1;
+        }else if(json.type === 'candidate') {
+            var candidate = new RTCIceCandidate(json.candidate);
+            var pos;
+            var i = 0;
+            for(i = 0; i < listeners.length; i++){
+                if(listeners[i].name === json.name){
+                    pos = listeners[i].index;
+                }
+            }
+            pcs[pos].addIceCandidate(candidate);
+            console.log(candidate);
         }
     };
     socket.onclose = function (event) {

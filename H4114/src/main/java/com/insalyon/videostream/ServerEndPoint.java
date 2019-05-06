@@ -68,9 +68,9 @@ public class ServerEndPoint {
             serverEndPointState.put(roomNumber, Boolean.FALSE);
         }
         else {
-            if(serverEndPoints.get(roomNumber).size() < 3){
+            if(serverEndPoints.get(roomNumber).size() < 10){
                 serverEndPoints.get(roomNumber).add(this);
-                if(serverEndPoints.get(roomNumber).size() == 2){
+                if(serverEndPoints.get(roomNumber).size() == 9){
                     serverEndPointState.replace(roomNumber, Boolean.TRUE);
                 }
                 JSONObject json  = new JSONObject();
