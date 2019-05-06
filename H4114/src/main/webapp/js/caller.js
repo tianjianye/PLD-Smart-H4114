@@ -207,4 +207,3 @@ function sendMessage(message){
     console.log('message sent : ' + msgString);
     socket.send(msgString);
 }
-
