@@ -12,10 +12,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,9 +28,9 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author pacabrera
  */
-@WebServlet(urlPatterns = {"/ActionServlet2"})
+@WebServlet(urlPatterns = {"/ActionServlet"})
 public class ActionServlet extends HttpServlet {
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -49,26 +51,29 @@ public class ActionServlet extends HttpServlet {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 JsonObject jsonResponse = new JsonObject();
                 HashMap<String, Boolean> rooms = ServerEndPoint.getServerEndPointState();
-                HashMap<String, Set <ServerEndPoint>> persons = ServerEndPoint.getServerEndPoints();
                 JsonArray jsonListe = new JsonArray();
-                if(!rooms.entrySet().isEmpty()){
-                    for (Map.Entry<String, Boolean> entry : rooms.entrySet()) {
-                        if(Objects.equals(entry.getValue(), Boolean.FALSE)){
-                            JsonObject json = new JsonObject();
-                            json.addProperty("num", entry.getKey());
-                            json.addProperty("person", persons.get(entry.getKey()).size());
-                            jsonListe.add(json);
-                        }
+                for (Map.Entry<String, Boolean> entry : rooms.entrySet()) {
+                    if(Objects.equals(entry.getValue(), Boolean.FALSE)){
+                        JsonObject json = new JsonObject();
+                        json.addProperty("num", entry.getKey());
+                        jsonListe.add(json);
                     }
                 }
                 jsonResponse.add("rooms", jsonListe);
                 out.println(gson.toJson(jsonResponse));
                 out.close();
             } else if(action.equals("create")){
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                
+            } else if(action.equals("join")){
+                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 JsonObject jsonResponse = new JsonObject();
-                int index = ServerEndPoint.getNumber();
-                jsonResponse.addProperty("index", index);
+                HashMap<String, Boolean> rooms = ServerEndPoint.getServerEndPointState();
+                String number = request.getParameter("number");
+                if(Objects.equals(rooms.get(number), Boolean.FALSE)){
+                        jsonResponse.addProperty("join", "true");
+                }else{
+                    jsonResponse.addProperty("join", "false");
+                }
                 out.println(gson.toJson(jsonResponse));
                 out.close();
             }
@@ -148,5 +153,8 @@ public class ActionServlet extends HttpServlet {
         jsonPersonne.addProperty("dateNaissance", p.getDateNaissance().toString());
         out.println(gson.toJson(jsonPersonne));
     }*/
-   
+
+    
+    
+    
 }

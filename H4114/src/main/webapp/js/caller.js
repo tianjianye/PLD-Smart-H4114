@@ -8,6 +8,7 @@ var socket;
 var localStream;
 var started = false;
 var pcs = [];
+var listeners = [];
 var index = 0;
 
 
@@ -57,11 +58,6 @@ function stop() {
     });
 }
 
-function setLocalAndSendMessage(sessionDescription) {
-    pcs[index].setLocalDescription(sessionDescription);
-    sendMessage(sessionDescription);
-}
-
 function errorMsg(msg, error) {
     const errorElement = document.querySelector('#errorMsg');
     errorElement.innerHTML += `<p>${msg}</p>`;
@@ -70,8 +66,8 @@ function errorMsg(msg, error) {
     }
 }
 
-function connectStart(){
-    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/10/start");
+function connectStart(number){
+    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/"+number+"/start/" + name);
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
     };
@@ -84,13 +80,22 @@ function connectStart(){
         if(json.type === 'answer') {
             console.log(json.sdp);
             var desc = new RTCSessionDescription(json.sdp);
-            pcs[index].setRemoteDescription(desc);
+            var pos;
+            var i = 0;
+            for(i = 0; i < listeners.length; i++){
+                if(listeners[i].name === json.name){
+                    pos = listeners[i].index;
+                }
+            }
+            pcs[pos].setRemoteDescription(desc);
         }else if(json.type === 'join'){
             index = index + 1;
-            createPeerConnection();
+            var mypos = index;
+            listeners.push({name:json.name,index:mypos});
+            createPeerConnection(mypos);
             console.log("Adding local stream.");
             console.log(localStream);
-            localStream.getTracks().forEach(track => pcs[index].addTrack(track, localStream));
+            localStream.getTracks().forEach(track => pcs[mypos].addTrack(track, localStream));
         }
     };
     socket.onclose = function (event) {
@@ -102,99 +107,31 @@ function connectStart(){
     };
 }
 
-function stream(){
-    if (!started && localStream) {
-        console.log("Creating PeerConnection.");
-        createPeerConnection();
-        console.log("Adding local stream.");
-        console.log(localStream);
-        localStream.getTracks().forEach(track => pcs[index].addTrack(track, localStream));
-        started = true;
-    }
-}
-
-
-function connectListen(){
-    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/10/listen");
-    socket.onopen = function (event) {
-        console.log("/!\\ Connexion serveur");
-    };
-    socket.onerror = function (event) {
-        console.log(event);
-    };
-    socket.onmessage = function (event) {
-        errorMsg(event.data);
-        console.log(event.data);
-        var json = JSON.parse(event.data);
-        if(json.type === 'candidate') {
-            var candidate = new RTCIceCandidate(json.candidate);
-            pcs[index].addIceCandidate(candidate);
-        }else if(json.type === 'offer') {
-            console.log(json.sdp);
-            handleVideoOfferMsg(json);
-        }
-    };
-    socket.onclose = function (event) {
-        sendMessage({
-            user : 'start',
-            type : 'bye'
-        });
-        console.log("/!\\ Déconnexion serveur");
-    };
-}
-
-function handleVideoOfferMsg(msg) {
-    errorMsg("handleVideoOfferMsg");
-    createPeerConnection();
-    errorMsg("handleVideoOfferMsg2");
-    var desc = new RTCSessionDescription(msg.sdp);
-    errorMsg("handleVideoOfferMsg4");
-
-    pcs[index].setRemoteDescription(desc).then(function() {
-        return pcs[index].createAnswer();
-        errorMsg("handleVideoOfferMsg5");
-    })
-    .then(function(answer) {
-        return pcs[index].setLocalDescription(answer);
-    })
-    .then(function() {
-        errorMsg("handleVideoOfferMsg3");
-        var msg = {
-            user: "listen",
-            type: "answer",
-            sdp: pcs[index].localDescription
-        }; 
-        errorMsg(msg);
-        sendMessage(msg);
-    });
-}
-
-
-function createPeerConnection() {
+function createPeerConnection(pos) {
     errorMsg("createPeerConnection");
     errorMsg(configuration);
-    pcs[index] = new RTCPeerConnection(configuration);
+    pcs[pos] = new RTCPeerConnection(configuration);
     errorMsg("createPeerConnection2");
 
-    pcs[index].onicecandidate = handleICECandidateEvent;
-    pcs[index].ontrack = handleTrackEvent;
-    pcs[index].onnegotiationneeded = handleNegotiationNeededEvent;
-    pcs[index].onremovetrack = handleRemoveTrackEvent;
-    pcs[index].oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
-    pcs[index].onicegatheringstatechange = handleICEGatheringStateChangeEvent;
-    pcs[index].onsignalingstatechange = handleSignalingStateChangeEvent;
+    pcs[pos].onicecandidate = handleICECandidateEvent;
+    pcs[pos].ontrack = handleTrackEvent;
+    pcs[pos].onnegotiationneeded = handleNegotiationNeededEvent(this);
+    pcs[pos].onremovetrack = handleRemoveTrackEvent;
+    pcs[pos].oniceconnectionstatechange = handleICEConnectionStateChangeEvent(this);
+    pcs[pos].onicegatheringstatechange = handleICEGatheringStateChangeEvent(this);
+    pcs[pos].onsignalingstatechange = handleSignalingStateChangeEvent(this);
 }
 
-function handleNegotiationNeededEvent() {
+function handleNegotiationNeededEvent(peer) {
     console.log("Sending offer to peer.");
-    pcs[index].createOffer().then(function(offer) {
-        return pcs[index].setLocalDescription(offer);
+    peer.createOffer().then(function(offer) {
+        return peer.setLocalDescription(offer);
     })
     .then(function() {
         sendMessage({
             user : 'start',
             type : 'offer',
-            sdp : pcs[index].localDescription
+            sdp : peer.localDescription
         });
     });
 }
@@ -209,10 +146,10 @@ function handleICECandidateEvent(event) {
     }
 }
 
-function handleICEConnectionStateChangeEvent(event) {
-    console.log("*** ICE connection state changed to " + pcs[index].iceConnectionState);
+function handleICEConnectionStateChangeEvent(peer) {
+    console.log("*** ICE connection state changed to " + peer.iceConnectionState);
 
-    switch(pcs[index].iceConnectionState) {
+    switch(peer.iceConnectionState) {
         case "closed":
         case "failed":
         case "disconnected":
@@ -220,16 +157,16 @@ function handleICEConnectionStateChangeEvent(event) {
     }
 }
 
-function handleSignalingStateChangeEvent(event) {
-    console.log("*** WebRTC signaling state changed to: " + pcs[index].signalingState);
-    switch(pcs[index].signalingState) {
+function handleSignalingStateChangeEvent(peer) {
+    console.log("*** WebRTC signaling state changed to: " + peer.signalingState);
+    switch(peer.signalingState) {
         case "closed":
             break;
     }
 }
 
-function handleICEGatheringStateChangeEvent(event) {
-    console.log("*** ICE gathering state changed to: " + pcs[index].iceGatheringState);
+function handleICEGatheringStateChangeEvent(peer) {
+    console.log("*** ICE gathering state changed to: " + peer.iceGatheringState);
 }
 
 function handleTrackEvent(event) {
@@ -256,3 +193,4 @@ function sendMessage(message){
     console.log('message sent : ' + msgString);
     socket.send(msgString);
 }
+
