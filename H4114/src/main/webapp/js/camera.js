@@ -11,10 +11,10 @@ var pc;
 
 
 
-const configuration = {iceServers: [/*{urls: 'stun:stun.l.googke.com:19302'}*/{urls: 'turn:10.43.6.50:3478',credential: 'test',
-    username: 'test'}]};
+const configuration = {iceServers: [/*{urls: 'stun:stun.l.googke.com:19302'}*/{urls: 'turn:10.43.7.214:3479',
+    username: 'test',credential: 'test'}]};
 const constraints = window.constraints = {
-  audio: false,
+  audio: true,
   video: true
 };
 
@@ -227,12 +227,7 @@ function handleICEGatheringStateChangeEvent(event) {
 
 function handleTrackEvent(event) {
     const video = document.getElementById('video');
-    console.log("ashoidiasipdfsapfopapasfjasfpasfopaspasfoafjoaspfosajasajsfajsfopasjfodjapsdjopasjdpoj");
-    errorMsg("ashoidiasipdfsapfopapasfjasfpasfopaspasfoafjoaspfosajasajsfajsfopasjfodjapsdjopasjdpoj");
     video.srcObject = event.streams[0];
-    console.log(event.streams.length);
-    console.log(document.getElementById("video").srcObject);
-    errorMsg(document.getElementById("video").srcObject.id);
 }
 
 function handleRemoveTrackEvent(event) {
