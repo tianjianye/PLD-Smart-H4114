@@ -6,8 +6,9 @@
 
 
 
-package com.insalyon.votewithbchain;
+package model;
 
+import model.Block;
 import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -17,24 +18,35 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  *
  * @author avianey
  */
-public class Sondage {
+public class Survey {
     
     private final String question;
     Map<String, Integer> responses;
     PrivateKey privateKey;
     PublicKey publicKey;
     int contestation;
+    long timeMillis;
+    String creator;
+    int stat;
     
     private ArrayList<Block> blockchain; 
+
+    public void setTimeMillis(long timeMillis) {
+        this.timeMillis = timeMillis;
+    }
     
-    public Sondage(String question)
+    public Survey(String question)
     {
         this.question = question;
+        this.stat = 0;
+        this.timeMillis = 10000;
         
          try { 
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -44,6 +56,8 @@ public class Sondage {
             this.privateKey = kp.getPrivate();
             this.blockchain = new ArrayList<>();
             this.responses = new HashMap<> ();
+            this.publicKey = kp.getPublic();
+            
            
         }
         catch(NoSuchAlgorithmException e) 
@@ -51,6 +65,34 @@ public class Sondage {
             throw new RuntimeException(e);
         }
     }
+    public void start()
+    {
+        System.out.println("START");
+        this.stat = 1;
+        final Survey s = this;
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                synchronized(s)
+                {
+                    try
+                    {
+                        s.wait(timeMillis);
+                        s.stat = 2;
+                        s.notifyAll();
+                        System.out.println("END");
+                        
+                    } catch (Exception e) {}
+                }
+            }
+        });
+
+        
+        
+
+    }
+    
     
     public void addResponseChoice (String response)
     {
@@ -67,10 +109,17 @@ public class Sondage {
         {
             lastHash = this.blockchain.get(this.blockchain.size()-1).getHash();
         }
+            
+        if (this.stat == 1)
+        {
+            Block block = new Block(data, lastHash, this.publicKey);
+            this.blockchain.add(block);
+            return block.getHash();
+                       
+        }
         
-        Block block = new Block(data, lastHash, this.publicKey);
-        this.blockchain.add(block);
-        return block.getHash();
+        return lastHash;
+
     }
     
     public void showResults (PrintStream stream)
@@ -127,7 +176,7 @@ public class Sondage {
             stream.println("Address : " + block.getHash());
             stream.println("Vote : " + choice);
            
-        }
+        } 
         
         stream.println("Bilan :" + responses.toString());
     }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.insalyon.votewithbchain;
+package model;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -114,6 +114,8 @@ public final class Block {
     }
 
     public void display(PrintStream stream) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        stream.println("Address : " + this.getHash());
+        stream.println("Vote : " + this.getData());
+        
     }
 }
