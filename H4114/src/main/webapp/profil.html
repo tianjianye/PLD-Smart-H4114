@@ -15,8 +15,16 @@
         <!--video id="video" width="640" height="480" autoplay></video-->
         <table class="table">
             <tr>
+                <th align="left">ID</th>
+                <td><span id="id_user"></span></td>
+            </tr>
+            <tr>
                 <th align="left">Email</th>
                 <td><span id="email"></span></td>
+            </tr>
+            <tr>
+                <th align="left">Pseudo</th>
+                <td><span id="pseudo"></span></td>
             </tr>
             <tr>
                 <th align="left">Sex</th>
@@ -60,7 +68,9 @@
                     dataType: 'json'
                 }).done(function (data) {
                     var reponse = data.profil;
+                    $('#id_user').text(reponse.id_user);
                     $('#email').text(reponse.email);
+                    $('#pseudo').text(reponse.pseudo);
                     $('#sex').text(reponse.sex);
                     $('#lastName').text(reponse.lastName);
                     $('#firstName').text(reponse.firstName);

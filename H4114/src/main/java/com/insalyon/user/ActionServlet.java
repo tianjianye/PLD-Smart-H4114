@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -19,6 +18,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.User;
 import service.DBConnection;
 
 /**
@@ -43,15 +43,16 @@ public class ActionServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String action=request.getParameter("action"); 
         Connection conn=null;
+        String email,password;
         switch(action){
             case "connect":
                 try {
-                    String email=request.getParameter("email");
-                    String password=request.getParameter("password");
+                    email=request.getParameter("email");
+                    password=request.getParameter("password");
                     JsonObject connection=new JsonObject();
                     JsonObject connect=new JsonObject();
                     conn = DBConnection.Connection();
-                    boolean flag=DBConnection.Connect(email, password, conn);
+                    boolean flag=User.Connect(email, password, conn);
                     try (PrintWriter out = response.getWriter()) {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         if(flag){
@@ -65,39 +66,61 @@ public class ActionServlet extends HttpServlet {
                         out.println(gson.toJson(connection));
                     }
                 }
-                catch (ClassNotFoundException | SQLException ex) {
+                catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                     Logger.getLogger(ActionServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             case "inscription":
+                email=request.getParameter("email");
+                String pseudo=request.getParameter("pseudo");
+                password=request.getParameter("password");
+                JsonObject inscription=new JsonObject();
                 try {
-                    String email=request.getParameter("email");
-                    String pseudo=request.getParameter("pseudo");
-                    String password=request.getParameter("password");
-                    JsonObject inscription=new JsonObject();
                     conn = DBConnection.Connection();
-                    int resultInsert=DBConnection.Insert(conn,email,pseudo,password);
-                    if(resultInsert!=-1){
+                    boolean exist=User.UserExist(email,pseudo,conn);
+                    System.out.println(exist);
+                    if(!exist){
+                        if(User.Insert(conn,email,pseudo,password)){
+                            System.out.println("abc");
+                            try (PrintWriter out = response.getWriter()) {
+                                Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                                JsonObject inscrit=new JsonObject();
+                                inscrit.addProperty("inscrit", "true");
+                                inscription.add("inscrit", inscrit);
+                                out.println(gson.toJson(inscription));
+                            }
+                        }
+                        else{
+                            try (PrintWriter out = response.getWriter()) {
+                                Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                                JsonObject inscrit=new JsonObject();
+                                inscrit.addProperty("inscrit", "false");
+                                inscription.add("inscrit", inscrit);
+                                out.println(gson.toJson(inscription));
+                            }
+                        }
+                    }
+                    else{
                         try (PrintWriter out = response.getWriter()) {
                             Gson gson=new GsonBuilder().setPrettyPrinting().create();
                             JsonObject inscrit=new JsonObject();
-                            inscrit.addProperty("inscrit", "true");
+                            inscrit.addProperty("inscrit", "false");
                             inscription.add("inscrit", inscrit);
                             out.println(gson.toJson(inscription));
                         }
                     }
-                } catch (ClassNotFoundException | SQLException ex) {
+                } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                     Logger.getLogger(ActionServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             case "profil":
                 try {
-                    String email=(String)request.getSession().getAttribute("email");
+                    email=(String)request.getSession().getAttribute("email");
                     PrintWriter out = response.getWriter();
                     Gson gson=new GsonBuilder().setPrettyPrinting().create();
                     ResultSet rs;
                     conn = DBConnection.Connection();
-                    rs = DBConnection.FindUserWithEmail(email, conn);
+                    rs = User.FindUserWithEmail(email, conn);
                     JsonObject jsonCompte=new JsonObject();
                     while (rs.next()){
                         jsonCompte.addProperty("id_user", rs.getString(1));
@@ -108,7 +131,7 @@ public class ActionServlet extends HttpServlet {
                     JsonObject container=new JsonObject();
                     container.add("profil", jsonCompte);
                     out.println(gson.toJson(container));
-                } catch (SQLException | ClassNotFoundException ex) {
+                } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                     Logger.getLogger(ActionServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
@@ -154,5 +177,4 @@ public class ActionServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

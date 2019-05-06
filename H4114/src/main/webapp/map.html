@@ -1,13 +1,14 @@
 <div>
-<!--<p id="demo" style="height: 30px; width: 100%;"></p>-->
-<div id="map" style="height: 100%; width: 100%;"></div>
-</div>
+    <p>Map content</p>
+<p id="demo" style="height: 30px; width: 100%;"></p>
+<div id="map" style="height: 500px; width: 100%;"></div>
 
+</div>
 <script>
 	function initMap() {
-		var location = {lat: 45.782012, lng: 4.872501};
+		var location = {lat: -25.363, lng: 131.044};
 		var map = new google.maps.Map(document.getElementById("map"), {
-			zoom: 19,
+			zoom: 4,
 			center: location
 		});
 		var marker = new google.maps.Marker({
