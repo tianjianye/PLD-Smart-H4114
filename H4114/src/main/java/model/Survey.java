@@ -15,19 +15,32 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.persistence.Id;
 
 /**
  *
  * @author avianey
  */
 public class Survey {
+
     
+    
+    @Id
+    private Integer id;
+    Assembly assembly;
     private final String question;
+    private ArrayList<String> choices;
     Map<String, Integer> responses;
     PrivateKey privateKey;
     PublicKey publicKey;
@@ -41,12 +54,22 @@ public class Survey {
     public void setTimeMillis(long timeMillis) {
         this.timeMillis = timeMillis;
     }
+     public Integer getId() {
+        return id;
+    }
+     
+     public void setId(Integer id) {
+       this.id = id;
+    }
     
-    public Survey(String question)
+    
+    public Survey(String question, String timeMillis)
     {
+        this.id = id;
         this.question = question;
         this.stat = 0;
-        this.timeMillis = 10000;
+        this.timeMillis = Long.parseLong(timeMillis);
+        this.choices = new ArrayList<>();
         
          try { 
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -93,12 +116,32 @@ public class Survey {
 
     }
     
+    public String getTimeMillis()
+   {
+       return Long.toString(this.timeMillis);
+   }
+    
+   public String getChoices()
+   {
+       String choices = "";
+       for (int i = 0; i < this.choices.size(); i++)
+       {
+           choices+=this.choices.get(i);
+           
+           if (i!=this.choices.size()-1)
+           {
+               choices+=";";
+           }
+       }
+       return choices;
+   }
     
     public void addResponseChoice (String response)
     {
         if (!response.isEmpty())
         {
             this.responses.put(response, 0);
+            this.choices.add(response);
         }
     }
     
@@ -199,6 +242,22 @@ public class Survey {
             stream.println("Data for block " + i + " : " + this.blockchain.get(i).getData());
         }
     }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public Map<String, Integer> getResponses() {
+        return responses;
+    }
+
+    public String getPublicKey() {
+        return Base64.getEncoder().encodeToString(this.publicKey.getEncoded());
+    }
+    
+    public String getPrivateKey() {
+        return Base64.getEncoder().encodeToString(this.publicKey.getEncoded());
+    }
     
     public Boolean isChainValid() {
         
@@ -226,7 +285,60 @@ public class Survey {
             return true;
     }
     
+    public static Survey getSurvey(Connection conn, String idSurvey) throws SQLException 
+    {
+        String sql="select * from surveys where id_survey = ? ";
+        PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);    
+        stmt.setInt(1, Integer.parseInt(idSurvey)); 
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs != null) 
+        {
+            rs.last();    
+            Survey survey = new Survey( 
+                  rs.getString("question"),
+                  rs.getString("time")
+            );
+            
+            survey.setTimeMillis(Long.parseLong(rs.getString("time")));
+            
+           
+            String [] choices = rs.getString("choices").split(";");
+            for (int i = 0; i < choices.length; i++)
+            {
+                survey.addResponseChoice(choices[i]);
+            }
+
+            return survey;  
+        } 
+        
+        return null;
+    }
     
+    public static boolean Insert(Connection conn, Survey survey) throws SQLException{
+            //String value="'"+email+"','"+pseudo+"','"+password+"'";
+            String sql = "insert into surveys(question,choices,time, publicKey, privateKey) values(?,?,?,?,?)";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);   
+            preparedStatement.setString(1, survey.getQuestion()); 
+            preparedStatement.setString(2, survey.getChoices());
+            preparedStatement.setString(3, survey.getTimeMillis());
+            preparedStatement.setString(4, survey.getPublicKey()); 
+            preparedStatement.setString(3, survey.getPrivateKey());
+            
+            int flag=preparedStatement.executeUpdate();
+            
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                survey.setId(generatedKeys.getInt(1));
+            }
+            else {
+                throw new SQLException("Creating user failed, no ID obtained.");
+            }
+        }
+            System.out.println("flag="+flag);
+            if (flag!=-1){return true;}
+            else{return false;}
+        }  
      
     
     

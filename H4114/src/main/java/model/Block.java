@@ -20,10 +20,10 @@ import javax.crypto.Cipher;
  * @author avianey
  */
 public final class Block {
-    
+
     private String hash;
     private String previousHash;
-    private byte [] data; 
+    private byte[] data;
 
     public String getHash() {
         return hash;
@@ -33,82 +33,67 @@ public final class Block {
         return previousHash;
     }
 
-    public byte [] getData() {
+    public byte[] getData() {
         return data;
     }
-    
-    public String  getDataString() {
+
+    public String getDataString() {
         return Base64.getEncoder().encodeToString(this.data);
     }
 
     public long getTimeStamp() {
         return timeStamp;
     }
-    
-    private final long timeStamp; 
-    
-    public Block(String data,String previousHash, PublicKey pk) 
-    {
-            this.data = encrypt(data, pk);
-            this.previousHash = previousHash;
-            this.timeStamp = new Date().getTime();
-            this.hash = calculateHash();
+
+    private final long timeStamp;
+
+    public Block(String data, String previousHash, PublicKey pk) {
+        this.data = encrypt(data, pk);
+        this.previousHash = previousHash;
+        this.timeStamp = new Date().getTime();
+        this.hash = calculateHash();
     }
-    
-    public byte [] encrypt(String data, PublicKey pk)
-    {
-        try
-        {
-            Cipher cipher = Cipher.getInstance("RSA");  
-            cipher.init(Cipher.ENCRYPT_MODE, pk); 
+
+    public byte[] encrypt(String data, PublicKey pk) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, pk);
             return cipher.doFinal(data.getBytes());
 
-        }
-        catch(Exception e) 
-        {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
-    public String decrypt(PrivateKey pk) 
-    {
 
-        try
-        {
-            Cipher cipher = Cipher.getInstance("RSA");  
+    public String decrypt(PrivateKey pk) {
+
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, pk);
             byte[] decryptedData = cipher.doFinal(this.data);
             return new String(decryptedData);
 
-        }
-        catch(Exception e) 
-        {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
- 
-    public void display()
-    {
+
+    public void display() {
         System.out.println("Address : " + this.getHash());
         System.out.println("Vote : " + this.getData());
     }
-    
 
     public String calculateHash() {
-        
-        String dataToHash =     previousHash + 
-                                Long.toString(timeStamp) +
-                                data;
 
-        try 
-        {     
+        String dataToHash = previousHash
+                + Long.toString(timeStamp)
+                + data;
+
+        try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] strHash = digest.digest(dataToHash.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(strHash);
-        } 
-        catch(NoSuchAlgorithmException e) 
-        {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
@@ -116,6 +101,6 @@ public final class Block {
     public void display(PrintStream stream) {
         stream.println("Address : " + this.getHash());
         stream.println("Vote : " + this.getData());
-        
+
     }
 }
