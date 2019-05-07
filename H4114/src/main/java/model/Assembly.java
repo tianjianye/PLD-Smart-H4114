@@ -159,7 +159,7 @@ public class Assembly {
                     rs.getString("title"),
                     rs.getString("description"),
                     rs.getString("place"),
-                    rs.getString("date"),
+                    rs.getString("date_time"),
                     rs.getString("radio"),
                     rs.getString("colour")
             );
@@ -176,7 +176,7 @@ public class Assembly {
     
     public static boolean Insert(Connection conn, Assembly assembly) throws SQLException {
         
-        String sql = "insert into assemblies(title,description,place,date,radio,colour)) values(?,?,?,?,?,?)";
+        String sql = "insert into assemblies(title,description,place,date_time,radio,colour)) values(?,?,?,?,?,?)";
         PreparedStatement preparedStatement = conn.prepareStatement(sql);
         preparedStatement.setString(1, assembly.getTitle());
         preparedStatement.setString(2, assembly.getDescription());

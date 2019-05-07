@@ -54,6 +54,7 @@ public class UserServlet extends HttpServlet {
         Participant participant;
         switch(action){
             case "connect":
+            {
                 try {
                     email=request.getParameter("email");
                     password=request.getParameter("password");
@@ -78,8 +79,9 @@ public class UserServlet extends HttpServlet {
                     Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
-                
+            }   
             case "inscription":
+            {
                 email=request.getParameter("email");
                 String pseudo=request.getParameter("pseudo");
                 password=request.getParameter("password");
@@ -122,9 +124,13 @@ public class UserServlet extends HttpServlet {
                 } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                     Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
                 break;
+            }
+            
                 
             case "profil":
+            {
                 try {
                     email=(String)request.getSession().getAttribute("email");
                     PrintWriter out = response.getWriter();
@@ -146,8 +152,10 @@ public class UserServlet extends HttpServlet {
                     Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+            }
                 
             case "joinAssembly":
+            {
                 
                 try {
                     JsonObject joinAssembly =new JsonObject();
@@ -208,8 +216,9 @@ public class UserServlet extends HttpServlet {
                 Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
             break;
-            
+            }
             case "getPseudo":
+            {
                 JsonObject getPseudo =new JsonObject();
                 
                 user = (User) request.getSession().getAttribute("participant");
@@ -253,9 +262,9 @@ public class UserServlet extends HttpServlet {
                 }
                 
             break;
-            
+            }
             case "createAssembly":
-                
+            {  
                 try {
                     JsonObject createAssembly =new JsonObject();
                     conn = DBConnection.Connection();
@@ -315,8 +324,7 @@ public class UserServlet extends HttpServlet {
                         
                         request.getSession().setAttribute("participant", participant);
                     }
-                    
-                    
+ 
                 }
                 else{
                     try (PrintWriter out = response.getWriter()) {
@@ -331,6 +339,7 @@ public class UserServlet extends HttpServlet {
                 Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
             break;
+            }
             default:
             }
     }
