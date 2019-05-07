@@ -32,3 +32,5 @@ function changeToAlert() {
     document.getElementById("alert").classList.add("active");
     $('#content').load("alert.html");
 }
+
+
