@@ -55,11 +55,9 @@ function getAssemblies()
         });
 }
 
-function getParticipants(callback)
+function getParticipants()
 {
-    console.log(callback);
-    var test = callback;
-    console.log(test);
+   
     $.ajax({
             url: './UserServlet',
             method: 'POST',
@@ -71,9 +69,7 @@ function getParticipants(callback)
                 alert("Error while sending new request");
             }
         }).done(function (data) {
-            console.log(test);
-            if(callback) callback(data.Participants); 
-             
+            console.log(data);
         });
 }
 
