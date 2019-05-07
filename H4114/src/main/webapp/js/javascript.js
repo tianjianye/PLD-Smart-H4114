@@ -25,6 +25,9 @@ function changeToVote() {
     document.getElementsByClassName("active")[0].classList.remove("active");
     document.getElementById("vote").classList.add("active");
     $('#content').load("vote.html");
+    
+    getAssemblies();
+    getParticipants();
 }
 
 function changeToAlert() {
@@ -33,4 +36,40 @@ function changeToAlert() {
     $('#content').load("alert.html");
 }
 
+
+function getAssemblies()
+{
+
+    $.ajax({
+            url: './UserServlet',
+            method: 'POST',
+            data: {
+                action: 'getAssemblies',
+            },
+            dataType: 'json',
+            error: function () {
+                alert("Error while sending new request");
+            }
+        }).done(function (data) {
+           
+        });
+}
+
+function getParticipants()
+{
+
+    $.ajax({
+            url: './UserServlet',
+            method: 'POST',
+            data: {
+                action: 'getParticipants',
+            },
+            dataType: 'json',
+            error: function () {
+                alert("Error while sending new request");
+            }
+        }).done(function (data) {
+           
+        });
+}
 

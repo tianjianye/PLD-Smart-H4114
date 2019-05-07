@@ -29,7 +29,7 @@ import org.json.simple.JSONObject;
 
 @ServerEndpoint(value = "/video/{room}/{usertype}/{username}")
 public class ServerEndPoint {
-    private Participant particiant;
+   
     
     
     private Session session;

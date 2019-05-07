@@ -18,6 +18,8 @@ import javax.persistence.Id;
  * @author avianey
  */
 public class User {
+
+    
     @Id
     private Integer id;
     private String email;
@@ -105,6 +107,29 @@ public class User {
         
         return null;
     }
+    
+    public static User getUser(Connection conn, Integer idU) throws SQLException 
+    {
+            String sql="select * from users where id_user = ? ";
+            PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);    
+            stmt.setInt(1, idU); 
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs != null) 
+            {
+                rs.last();    
+                User user = new User( 
+                      rs.getString("email"),
+                      rs.getString("password"),
+                      rs.getString("pseudo") 
+                );
+                user.setId(idU);
+
+                return user;  
+            } 
+        return null;
+    }
+    
     
     public static boolean IsPartAssembly(Connection conn, User user) throws SQLException{
         String sql="select * from participants where id_user = ?";

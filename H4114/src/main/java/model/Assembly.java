@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.persistence.Id;
 import service.Util;
+import com.google.gson.JsonObject;
 
 /**
  *
@@ -30,7 +31,6 @@ public class Assembly {
     private Survey currentSurvey;
     private String colour;
     private String title;
-    private String place;
     private Date date;
     private Time time;
     private String description;
@@ -38,13 +38,13 @@ public class Assembly {
     private double latitude;
     private double longitude;
 
-    public Assembly(Integer id, String title, String description,String date, String radio, String colour, String latitude, String longitude) {
+    public Assembly(Integer id, String title, String description,String date, int radio, String colour, double latitude, double longitude) {
         this.id = id;
         this.currentSurvey = null;
         this.colour = "red";
-        this.radio = Integer.parseInt(radio);
-        this.latitude = Double.parseDouble(latitude);
-        this.longitude = Double.parseDouble(longitude);
+        this.radio = radio;
+        this.latitude = latitude;
+        this.longitude = longitude;
 
         this.date = Util.StringToDate(date);
 
@@ -52,10 +52,35 @@ public class Assembly {
         this.description = description;
 
         this.colour = colour;
-        this.place = place;
+    
         // this.latitiude = getlat
 
     }
+
+    @Override
+    public String toString() {
+        return "{id:" + id + ", "
+                + "colour:" + colour + ", "
+                + "title:" + title + ", "
+                + "description:" + description + ","
+                + " radio:" + radio + ","
+                + " latitude:" + latitude + ","
+                + " longitude:" + longitude+"}";
+    }
+    
+    public JsonObject toJson(){
+        JsonObject json = new JsonObject();
+        json.addProperty("id", this.id);
+        json.addProperty("colour", this.colour);
+        json.addProperty("title", this.title);
+        json.addProperty("description", this.description);
+        json.addProperty("radio", this.radio);
+        json.addProperty("latitude", this.latitude);
+        json.addProperty("longitude", this.longitude);
+        return json;
+    }
+    
+    
 
     public String getColour() {
         return colour;
@@ -73,13 +98,6 @@ public class Assembly {
         this.title = title;
     }
 
-    public String getPlace() {
-        return place;
-    }
-
-    public void setPlace(String place) {
-        this.place = place;
-    }
 
     public Date getDate() {
         return date;
@@ -149,32 +167,29 @@ public class Assembly {
         this.currentSurvey = currentSurvey;
     }
 
-    public static Assembly getAssembly(Connection conn, String idAssembly) throws SQLException, ParseException {
+    public static Assembly getAssembly(Connection conn, Integer idAssembly) throws SQLException  {
         String sql = "select * from assemblies where id_assembly = ? ";
         PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        stmt.setInt(1, Integer.parseInt(idAssembly));
+        stmt.setInt(1, idAssembly);
         ResultSet rs = stmt.executeQuery();
-
         if (rs != null) {
             rs.last();
             Assembly assembly = new Assembly(
-                    Integer.parseInt(idAssembly),
+                   idAssembly,
                     rs.getString("title"),
                     rs.getString("description"),
                     rs.getString("date_time"),
-                    rs.getString("radio"),
+                    rs.getInt("radio"),
                     rs.getString("colour"),
-                    rs.getString("latitiude"),
-                    rs.getString("longitude")
+                    rs.getDouble("latitude"),
+                    rs.getDouble("longitude")
             );
-
-            String idSurvey = rs.getString("id_survey");
-            Survey survey = Survey.GetSurvey(conn, idSurvey);
+            
+            Survey survey = Survey.getSurvey(idAssembly);
             assembly.setCurrentSurvey(survey);
 
             return assembly;
         }
-
         return null;
     }
     
@@ -184,12 +199,11 @@ public class Assembly {
         PreparedStatement preparedStatement = conn.prepareStatement(sql,  Statement.RETURN_GENERATED_KEYS); 
         preparedStatement.setString(1, assembly.getTitle());
         preparedStatement.setString(2, assembly.getDescription());
-        preparedStatement.setString(3, assembly.getPlace());
         preparedStatement.setString(4, Util.DateToString(assembly.getDate()));
-        preparedStatement.setString(5, Integer.toString(assembly.getRadio()));
+        preparedStatement.setInt(5, assembly.getRadio());
         preparedStatement.setString(6, assembly.getColour());
-        preparedStatement.setString(7, Double.toString(assembly.getLatitude()));
-        preparedStatement.setString(8, Double.toString(assembly.getLongitude()));
+        preparedStatement.setDouble(7, assembly.getLatitude());
+        preparedStatement.setDouble(8, assembly.getLongitude());
 
         int flag = preparedStatement.executeUpdate();
 
@@ -206,6 +220,34 @@ public class Assembly {
         } else {
             return false;
         }
+    }
+    
+    public static ArrayList<Assembly> GetAssemblies(Connection conn) throws SQLException {
+        //String value="'"+email+"','"+pseudo+"','"+password+"'";
+        //String sql = "insert into participants(idUser,idAssembly,title,description,adresse,date, time)) values(?,?,?,?,?,?,?)";
+        ArrayList<Assembly> assemblies = new ArrayList<>();
+        String sql="select * from assemblies";
+        PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);            
+        ResultSet rs = stmt.executeQuery();
+
+        while(rs.next())
+        {
+            Assembly assembly = new Assembly(
+                    rs.getInt("id_assembly"),
+                    rs.getString("title"),
+                    rs.getString("description"),
+                    rs.getString("date_time"),
+                    rs.getInt("radio"),
+                    rs.getString("colour"),
+                    rs.getDouble("latitude"),
+                    rs.getDouble("longitude")
+            );
+            
+            
+            assemblies.add(assembly);
+        }
+
+        return assemblies;
     }
 
 }
