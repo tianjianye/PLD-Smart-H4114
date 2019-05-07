@@ -144,7 +144,7 @@ public final class Block {
     public static boolean Insert(Connection conn, Block block) throws SQLException {
         //String value="'"+email+"','"+pseudo+"','"+password+"'";
         //String sql = "insert into participants(idUser,idAssembly,title,description,adresse,date, time)) values(?,?,?,?,?,?,?)";
-        String sql = "insert into blocks(id_survey,address,previousAddress,data)) values(?,?,?,?)";
+        String sql = "insert into blocks(id_survey,address,previous_Address,data)) values(?,?,?,?)";
         PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); 
         preparedStatement.setString(1, Integer.toString(block.getSurvey().getId()));
         preparedStatement.setString(2, block.getHash());

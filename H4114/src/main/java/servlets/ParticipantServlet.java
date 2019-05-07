@@ -90,7 +90,6 @@ public class ParticipantServlet extends HttpServlet {
             case "voteSurvey":
             {
                 try {
-
                     conn = DBConnection.Connection();
                     Participant participant = (Participant) request.getSession().getAttribute("participant");
                     if (participant == null) {
@@ -150,7 +149,7 @@ public class ParticipantServlet extends HttpServlet {
                 try {
                     conn = DBConnection.Connection();
                     Participant participant = (Participant) request.getSession().getAttribute("participant");
-                    if (participant == null || !participant.getStatus().contains("2")) {
+                    /*if (participant == null || !participant.getStatus().contains("2")) {
                         break;
                     }
 
@@ -159,7 +158,7 @@ public class ParticipantServlet extends HttpServlet {
                     if (survey != null) {
                         break;
                     }
-
+                    */    
                     String question = request.getParameter("question");
                     String choicesS = request.getParameter("choices");
                     String time = request.getParameter("time");
@@ -176,6 +175,8 @@ public class ParticipantServlet extends HttpServlet {
                     if (Survey.Insert(conn, survey)) {
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         JsonObject cSurvey = new JsonObject();
+                        System.out.println("sadadafhioaiohsvhiozxihovz");
+                        
                         cSurvey.addProperty("createdSurvey", "true");
                         cSurvey.addProperty("id_survey", survey.getId().toString());
                         surveyInfo.add("survey", cSurvey);
@@ -185,6 +186,7 @@ public class ParticipantServlet extends HttpServlet {
                     } else {
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         JsonObject cSurvey = new JsonObject();
+                        System.out.println("asdasdsadadafhioaiohsvhioasdazxihovz");
                         cSurvey.addProperty("createdSurvey", "false");
                         surveyInfo.add("survey", cSurvey);
                         out.println(gson.toJson(surveyInfo));
@@ -200,7 +202,7 @@ public class ParticipantServlet extends HttpServlet {
                 // conn = DBConnection.Connection();
                 Participant participant = (Participant) request.getSession().getAttribute("participant");
                 if (participant == null) {
-                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "1");
                     out.println(gson.toJson(surveyInfo)); 
@@ -211,7 +213,7 @@ public class ParticipantServlet extends HttpServlet {
                 survey = participant.getAssembly().getCurrentSurvey();
                 
                 if (survey == null && !participant.getStatus().contains("2")) {
-                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "1");
                     out.println(gson.toJson(surveyInfo)); 

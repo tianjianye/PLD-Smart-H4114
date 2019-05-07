@@ -350,13 +350,13 @@ public class Survey {
     
     public static boolean Insert(Connection conn, Survey survey) throws SQLException{
             //String value="'"+email+"','"+pseudo+"','"+password+"'";
-            String sql = "insert into surveys(question,choices,time, publicKey, privateKey) values(?,?,?,?,?)";
+            String sql = "insert into surveys(question, choices, duration, public_Key, private_Key) values(?,?,?,?,?)";
             PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);      
             preparedStatement.setString(1, survey.getQuestion()); 
             preparedStatement.setString(2, survey.getChoices());
             preparedStatement.setString(3, survey.getTimeMillis());
             preparedStatement.setString(4, survey.getPublicKey()); 
-            preparedStatement.setString(3, survey.getPrivateKey());
+            preparedStatement.setString(5, survey.getPrivateKey());
             
             int flag=preparedStatement.executeUpdate();
             
