@@ -124,7 +124,7 @@ public class User {
     }
     
     public static ResultSet FindUserWithEmail(Connection conn, String email) throws SQLException{
-        String sql="select * from utilisateurs where email = ?";
+        String sql="select * from users where email = ?";
         PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         stmt.setString(1, email);
         ResultSet rs = stmt.executeQuery();

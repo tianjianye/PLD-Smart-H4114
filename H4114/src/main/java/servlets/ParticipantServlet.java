@@ -9,14 +9,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.insalyon.videostream.ServerEndPoint;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.Key;
-import java.security.PublicKey;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -24,10 +25,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import model.Assembly;
 import model.Participant;
 import model.Survey;
-import model.User;
 import service.DBConnection;
 
 /**
@@ -52,9 +51,44 @@ public class ParticipantServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String action = request.getParameter("action");
         Connection conn = null;
+        PrintWriter out;
+        out = response.getWriter();
         Survey survey;
         switch (action) {
+            case "room" :
+            {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonObject jsonResponse = new JsonObject();
+                HashMap<String, Boolean> rooms = ServerEndPoint.getServerEndPointState();
+                HashMap<String, Set <ServerEndPoint>> persons = ServerEndPoint.getServerEndPoints();
+                JsonArray jsonListe = new JsonArray();
+                if(!rooms.entrySet().isEmpty()){
+                    for (Map.Entry<String, Boolean> entry : rooms.entrySet()) {
+                        if(Objects.equals(entry.getValue(), Boolean.FALSE)){
+                            JsonObject json = new JsonObject();
+                            json.addProperty("num", entry.getKey());
+                            json.addProperty("person", persons.get(entry.getKey()).size());
+                            jsonListe.add(json);
+                        }
+                    }
+                }
+                jsonResponse.add("rooms", jsonListe);
+                out.println(gson.toJson(jsonResponse));
+                out.close();
+                break;
+            }
+            case "create" :
+            {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonObject jsonResponse = new JsonObject();
+                int index = ServerEndPoint.getNumber();
+                jsonResponse.addProperty("index", index);
+                out.println(gson.toJson(jsonResponse));
+                out.close();
+                break;
+            }
             case "voteSurvey":
+            {
                 try {
 
                     conn = DBConnection.Connection();
@@ -70,8 +104,6 @@ public class ParticipantServlet extends HttpServlet {
                     }
                     String reponse = request.getParameter("response");
                     String address = survey.addAnswerVote(reponse);
-                    PrintWriter out;
-                    out = response.getWriter();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject vote = new JsonObject();
                     vote.addProperty("address", address);
@@ -83,8 +115,9 @@ public class ParticipantServlet extends HttpServlet {
                     Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
-
+            }
             case "startSurvey":
+            {
                 survey = (Survey) request.getSession().getAttribute("Survey");
 
                 if (survey == null) {
@@ -94,9 +127,9 @@ public class ParticipantServlet extends HttpServlet {
                 survey.start();
 
                 break;
-                
-                
+            }   
             case "getResultSurvey":
+            {
                 survey = (Survey) request.getSession().getAttribute("Survey");
         
                 try {
@@ -113,9 +146,9 @@ public class ParticipantServlet extends HttpServlet {
                     Logger.getLogger(ParticipantServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
-
+            }
             case "createSurvey":
-
+            {
                 try {
                     conn = DBConnection.Connection();
                     Participant participant = (Participant) request.getSession().getAttribute("participant");
@@ -143,36 +176,29 @@ public class ParticipantServlet extends HttpServlet {
                     JsonObject surveyInfo = new JsonObject();
 
                     if (Survey.Insert(conn, survey)) {
+                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                        JsonObject cSurvey = new JsonObject();
+                        cSurvey.addProperty("createdSurvey", "true");
+                        cSurvey.addProperty("id_survey", survey.getId().toString());
+                        surveyInfo.add("survey", cSurvey);
+                        out.println(gson.toJson(surveyInfo));
 
-                        try (PrintWriter out = response.getWriter()) {
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            JsonObject cSurvey = new JsonObject();
-                            cSurvey.addProperty("createdSurvey", "true");
-                            cSurvey.addProperty("id_survey", survey.getId().toString());
-                            surveyInfo.add("survey", cSurvey);
-                            out.println(gson.toJson(surveyInfo));
-                            
-                            request.getSession().setAttribute("survey", survey);
-                        }
+                        request.getSession().setAttribute("survey", survey);
                     } else {
-                        try (PrintWriter out = response.getWriter()) {
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            JsonObject cSurvey = new JsonObject();
-                            cSurvey.addProperty("createdSurvey", "false");
-                            surveyInfo.add("survey", cSurvey);
-                            out.println(gson.toJson(surveyInfo));
-                        }
+                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                        JsonObject cSurvey = new JsonObject();
+                        cSurvey.addProperty("createdSurvey", "false");
+                        surveyInfo.add("survey", cSurvey);
+                        out.println(gson.toJson(surveyInfo));
                     }
                 } catch (ClassNotFoundException | SQLException | InstantiationException | IllegalAccessException ex) {
                     Logger.getLogger(ParticipantServlet.class.getName()).log(Level.SEVERE, null, ex);
 
                 }
                 break;
-
+            }
             case "infoSurvey":
-
-                PrintWriter out;
-                out = response.getWriter();
+            {
                 // conn = DBConnection.Connection();
                 Participant participant = (Participant) request.getSession().getAttribute("participant");
                 if (participant == null || !participant.getStatus().contains("2")) {
@@ -205,6 +231,7 @@ public class ParticipantServlet extends HttpServlet {
                 out.println(gson.toJson(surveyInfo));
 
                 break;
+            }
             default:
         }
     }

@@ -61,7 +61,7 @@
         //document.getElementById("contentVideo").style.display = "inline";
         var roomNumber;
          $.ajax({
-            url: './ActionServlet2',
+            url: './ParticipantServlet',
             method: 'POST',
             data: {
                 action : 'create'
@@ -106,7 +106,7 @@
 
     function refreshInfos(){
          $.ajax({
-            url: './ActionServlet2',
+            url: './ParticipantServlet',
             method: 'POST',
             data: {
                 action : 'room'
@@ -127,7 +127,7 @@
 
     $(document).ready(function () {
         $.ajax({
-            url: './ActionServlet2',
+            url: './ParticipantServlet',
             method: 'POST',
             data: {
                 action : 'room'
