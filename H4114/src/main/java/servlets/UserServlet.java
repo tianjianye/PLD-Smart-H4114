@@ -334,6 +334,7 @@ public class UserServlet extends HttpServlet {
                     participant = (Participant) request.getSession().getAttribute("participant");
                     if (participant != null)
                     {
+                        System.out.println("123wqwqqwqwqwqwqwqw");
                         break;
                     }
                     
@@ -351,6 +352,7 @@ public class UserServlet extends HttpServlet {
                 
                     if (user == null)
                     {
+                        System.out.println("asdwqwqqasdasdwqwqwqwqwqw");
                         break;
                     }
                                    
@@ -365,6 +367,7 @@ public class UserServlet extends HttpServlet {
                             request.getSession().setAttribute("assembly", assembly);
                     }
                     else{
+                        System.out.println("wqwqqwqwqwqwqwqw");
                         break;
                     }
                

@@ -90,7 +90,6 @@ public class ParticipantServlet extends HttpServlet {
             case "voteSurvey":
             {
                 try {
-
                     conn = DBConnection.Connection();
                     Participant participant = (Participant) request.getSession().getAttribute("participant");
                     if (participant == null) {
@@ -145,7 +144,7 @@ public class ParticipantServlet extends HttpServlet {
                 try {
                     conn = DBConnection.Connection();
                     Participant participant = (Participant) request.getSession().getAttribute("participant");
-                    if (participant == null || participant.getStatus() < 2) {
+                    /*if (participant == null || !participant.getStatus().contains("2")) {
                         break;
                     }
 
@@ -154,7 +153,7 @@ public class ParticipantServlet extends HttpServlet {
                     if (survey != null) {
                         break;
                     }
-
+                    */    
                     String question = request.getParameter("question");
                     String choicesS = request.getParameter("choices");
                     String time = request.getParameter("time");
@@ -166,25 +165,29 @@ public class ParticipantServlet extends HttpServlet {
                         survey.addResponseChoice(choices[i]);
                     }
                     
-                    Survey.addSurvey(participant.getAssembly().getId(), survey);
+                    //Survey.addSurvey(participant.getAssembly().getId(), survey);
+                    Survey.addSurvey(55545, survey);
                     JsonObject surveyInfo = new JsonObject();
 
-                    //if (Survey.Insert(conn, survey)) {
+                    if (Survey.Insert(conn, survey)) {
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         JsonObject cSurvey = new JsonObject();
+                        
                         cSurvey.addProperty("createdSurvey", "true");
+                        System.out.println(survey);
+                        System.out.println(survey.getId());
                         cSurvey.addProperty("id_survey", survey.getId().toString());
                         surveyInfo.add("survey", cSurvey);
                         out.println(gson.toJson(surveyInfo));
 
                         request.getSession().setAttribute("survey", survey);
-                   /* } else {
+                    } else {
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         JsonObject cSurvey = new JsonObject();
                         cSurvey.addProperty("createdSurvey", "false");
                         surveyInfo.add("survey", cSurvey);
                         out.println(gson.toJson(surveyInfo));
-                    }*/
+                    }
                 } catch (ClassNotFoundException | SQLException | InstantiationException | IllegalAccessException ex) {
                     Logger.getLogger(ParticipantServlet.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -196,7 +199,7 @@ public class ParticipantServlet extends HttpServlet {
                 // conn = DBConnection.Connection();
                 Participant participant = (Participant) request.getSession().getAttribute("participant");
                 if (participant == null) {
-                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "1");
                     out.println(gson.toJson(surveyInfo)); 
@@ -215,7 +218,6 @@ public class ParticipantServlet extends HttpServlet {
                 }
                 
                
-                
                 if (survey == null && participant.getStatus() >= 2) {
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();

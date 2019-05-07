@@ -8,7 +8,6 @@
 
 package model;
 
-import model.Block;
 import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -20,13 +19,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -38,6 +37,7 @@ public class Survey {
     private static HashMap<Integer, Survey> surveys = new HashMap<Integer, Survey>();
     
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     Assembly assembly;
     private String question;
@@ -366,33 +366,27 @@ public class Survey {
     }
     
     public static boolean Insert(Connection conn, Survey survey) throws SQLException{
-            //String value="'"+email+"','"+pseudo+"','"+password+"'";
-            String sql = "insert into surveys(question,choices,duration, public_Key, private_Key) values(?,?,?,?,?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);      
-            preparedStatement.setString(1, survey.getQuestion()); 
-            preparedStatement.setString(2, survey.getChoices());
-            preparedStatement.setInt(3, survey.getTimeMillis());
-            preparedStatement.setBytes(4, survey.getPublicKey()); 
-            preparedStatement.setBytes(3, survey.getPrivateKey());
-            
-            int flag=preparedStatement.executeUpdate();
-            
-            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-            if (generatedKeys.next()) {
-                survey.setId(generatedKeys.getInt(1));
-            }
-            else {
-                throw new SQLException("Creating user failed, no ID obtained.");
-            }
+        //String value="'"+email+"','"+pseudo+"','"+password+"'";
+        String sql = "insert into surveys(question,choices,duration, public_Key, private_Key) values(?,?,?,?,?)";
+        PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);      
+        preparedStatement.setString(1, survey.getQuestion()); 
+        preparedStatement.setString(2, survey.getChoices());
+        preparedStatement.setInt(3, survey.getTimeMillis());
+        preparedStatement.setBytes(4, survey.getPublicKey()); 
+        preparedStatement.setBytes(5, survey.getPrivateKey());
+
+        int flag=preparedStatement.executeUpdate();
+
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+            survey.setId(generatedKeys.getInt(1));
         }
-            System.out.println("flag="+flag);
-            if (flag!=-1){return true;}
-            else{return false;}
-        }  
-    
-    
-    
-     
-    
-    
+        else {
+            throw new SQLException("Creating user failed, no ID obtained.");
+        }
+    }
+        System.out.println("flag="+flag);
+        if (flag!=-1){return true;}
+        else{return false;}
+    }  
 }
