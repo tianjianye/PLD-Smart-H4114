@@ -40,7 +40,7 @@ public class Survey {
     @Id
     private Integer id;
     Assembly assembly;
-    private final String question;
+    private String question;
     private ArrayList<String> choices;
     Map<String, Integer> responses;
     PrivateKey privateKey;
@@ -156,7 +156,7 @@ public class Survey {
             
         if (this.stat == 1)
         {
-            Block block = new Block(data, lastHash, this.publicKey);
+            Block block = new Block(this, data, lastHash, this.publicKey);
             this.blockchain.add(block);
             return block.getHash();
                        
@@ -244,6 +244,9 @@ public class Survey {
         }
     }
 
+    public void  setQuestion(String question) {
+        this.question = question;
+    }
     public String getQuestion() {
         return question;
     }
@@ -258,6 +261,11 @@ public class Survey {
     
     public String getPrivateKey() {
         return Base64.getEncoder().encodeToString(this.publicKey.getEncoded());
+    }
+    
+    public void clear() {
+       this.blockchain.clear();
+       this.choices.clear();
     }
     
     public Boolean isChainValid() {
@@ -286,7 +294,7 @@ public class Survey {
             return true;
     }
     
-    public static Survey getSurvey(Connection conn, String idSurvey) throws SQLException 
+    public static Survey GetSurvey(Connection conn, String idSurvey) throws SQLException 
     {
         String sql="select * from surveys where id_survey = ? ";
         PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);    
@@ -316,6 +324,30 @@ public class Survey {
         return null;
     }
     
+    public static boolean Update(Connection conn, Survey survey) throws SQLException 
+    {
+        String sql="select * from surveys where id_survey = ? ";
+        PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);    
+        stmt.setInt(1,survey.getId()); 
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs != null) 
+        {
+            rs.last();    
+            survey.setQuestion(rs.getString("question"));
+            survey.setTimeMillis(Long.parseLong(rs.getString("time")));
+            survey.clear();
+            String [] choices = rs.getString("choices").split(";");
+            for (int i = 0; i < choices.length; i++)
+            {
+                survey.addResponseChoice(choices[i]);
+            }
+            return true;
+        } 
+        
+        return false;
+    }
+    
     public static boolean Insert(Connection conn, Survey survey) throws SQLException{
             //String value="'"+email+"','"+pseudo+"','"+password+"'";
             String sql = "insert into surveys(question,choices,time, publicKey, privateKey) values(?,?,?,?,?)";
@@ -340,6 +372,9 @@ public class Survey {
             if (flag!=-1){return true;}
             else{return false;}
         }  
+    
+    
+    
      
     
     
