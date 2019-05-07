@@ -8,7 +8,6 @@
 
 package model;
 
-import model.Block;
 import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -20,13 +19,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -35,9 +34,10 @@ import javax.persistence.Id;
  */
 public class Survey {
 
-    
+    private static HashMap<Integer, Survey> surveys = new HashMap<Integer, Survey>();
     
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     Assembly assembly;
     private String question;
@@ -46,13 +46,27 @@ public class Survey {
     PrivateKey privateKey;
     PublicKey publicKey;
     int contestation;
-    long timeMillis;
+    int timeMillis;
     String creator;
     int stat;
     
     private ArrayList<Block> blockchain; 
+    
+    public HashMap<Integer, Survey> getSurveys(){
+        return surveys;
+    }
+    
+    public static void addSurvey(Integer idAssembly, Survey survey)
+    {
+        surveys.put(idAssembly, survey);
+    }
+    public static Survey getSurvey(Integer idAssembly)
+    {
+        return surveys.get(idAssembly);
+    }
+    
 
-    public void setTimeMillis(long timeMillis) {
+    public void setTimeMillis(int timeMillis) {
         this.timeMillis = timeMillis;
     }
      public Integer getId() {
@@ -69,7 +83,7 @@ public class Survey {
         this.id = id;
         this.question = question;
         this.stat = 0;
-        this.timeMillis = Long.parseLong(timeMillis);
+        this.timeMillis = Integer.parseInt(timeMillis);
         this.choices = new ArrayList<>();
         
          try { 
@@ -88,7 +102,9 @@ public class Survey {
         {
             throw new RuntimeException(e);
         }
+        surveys.put(this.id, this);
     }
+    
     public void start()
     {
         System.out.println("START");
@@ -105,6 +121,7 @@ public class Survey {
                         s.wait(timeMillis);
                         s.stat = 2;
                         s.notifyAll();
+                        
                         System.out.println("END");
                         
                     } catch (Exception e) {}
@@ -117,9 +134,9 @@ public class Survey {
 
     }
     
-    public String getTimeMillis()
+    public int getTimeMillis()
    {
-       return Long.toString(this.timeMillis);
+       return this.timeMillis;
    }
     
    public String getChoices()
@@ -255,12 +272,12 @@ public class Survey {
         return responses;
     }
 
-    public String getPublicKey() {
-        return Base64.getEncoder().encodeToString(this.publicKey.getEncoded());
+    public byte[] getPublicKey() {
+        return this.publicKey.getEncoded();
     }
     
-    public String getPrivateKey() {
-        return Base64.getEncoder().encodeToString(this.publicKey.getEncoded());
+    public byte[] getPrivateKey() {
+        return this.publicKey.getEncoded();
     }
     
     public void clear() {
@@ -306,10 +323,10 @@ public class Survey {
             rs.last();    
             Survey survey = new Survey( 
                   rs.getString("question"),
-                  rs.getString("time")
+                  rs.getString("duration")
             );
             
-            survey.setTimeMillis(Long.parseLong(rs.getString("time")));
+            survey.setTimeMillis(Integer.parseInt(rs.getString("time")));
             
            
             String [] choices = rs.getString("choices").split(";");
@@ -335,7 +352,7 @@ public class Survey {
         {
             rs.last();    
             survey.setQuestion(rs.getString("question"));
-            survey.setTimeMillis(Long.parseLong(rs.getString("time")));
+            survey.setTimeMillis(Integer.parseInt(rs.getString("time")));
             survey.clear();
             String [] choices = rs.getString("choices").split(";");
             for (int i = 0; i < choices.length; i++)
@@ -349,33 +366,27 @@ public class Survey {
     }
     
     public static boolean Insert(Connection conn, Survey survey) throws SQLException{
-            //String value="'"+email+"','"+pseudo+"','"+password+"'";
-            String sql = "insert into surveys(question, choices, duration, public_Key, private_Key) values(?,?,?,?,?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);      
-            preparedStatement.setString(1, survey.getQuestion()); 
-            preparedStatement.setString(2, survey.getChoices());
-            preparedStatement.setString(3, survey.getTimeMillis());
-            preparedStatement.setString(4, survey.getPublicKey()); 
-            preparedStatement.setString(5, survey.getPrivateKey());
-            
-            int flag=preparedStatement.executeUpdate();
-            
-            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-            if (generatedKeys.next()) {
-                survey.setId(generatedKeys.getInt(1));
-            }
-            else {
-                throw new SQLException("Creating user failed, no ID obtained.");
-            }
+        //String value="'"+email+"','"+pseudo+"','"+password+"'";
+        String sql = "insert into surveys(question,choices,duration, public_Key, private_Key) values(?,?,?,?,?)";
+        PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);      
+        preparedStatement.setString(1, survey.getQuestion()); 
+        preparedStatement.setString(2, survey.getChoices());
+        preparedStatement.setInt(3, survey.getTimeMillis());
+        preparedStatement.setBytes(4, survey.getPublicKey()); 
+        preparedStatement.setBytes(5, survey.getPrivateKey());
+
+        int flag=preparedStatement.executeUpdate();
+
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+            survey.setId(generatedKeys.getInt(1));
         }
-            System.out.println("flag="+flag);
-            if (flag!=-1){return true;}
-            else{return false;}
-        }  
-    
-    
-    
-     
-    
-    
+        else {
+            throw new SQLException("Creating user failed, no ID obtained.");
+        }
+    }
+        System.out.println("flag="+flag);
+        if (flag!=-1){return true;}
+        else{return false;}
+    }  
 }

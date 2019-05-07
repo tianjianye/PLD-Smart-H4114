@@ -50,15 +50,16 @@ function createRally() {
         $('#message').text("Failed");
     } else {
         $.ajax({
-            url: './ActionServlet',
+            url: './UserServlet',
             method: 'POST',
             data: {
-                action: 'create rally',
+                action: 'createAssembly',
                 rally: rally,
                 description: description,
-                place: place,
-                date: date,
-                time: time,
+                latitude: 44.12312,
+                longitude: 102.12312,
+                colour: "white",
+                date_time: date,
                 radio: radio,
                 email: email,
                 password: password

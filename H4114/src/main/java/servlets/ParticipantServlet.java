@@ -96,7 +96,7 @@ public class ParticipantServlet extends HttpServlet {
                         break;
                     }
 
-                    survey = (Survey) request.getSession().getAttribute("Survey");
+                    survey = Survey.getSurvey(participant.getAssembly().getId());
 
                     if (survey == null) {
                         break;
@@ -117,11 +117,11 @@ public class ParticipantServlet extends HttpServlet {
             }
             case "startSurvey":
             {
-                survey = (Survey) request.getSession().getAttribute("Survey");
-
-                if (survey == null) {
+                Participant participant = (Participant) request.getSession().getAttribute("participant");
+                if (participant == null || participant.getStatus() < 2) {
                     break;
                 }
+                survey = Survey.getSurvey(participant.getAssembly().getId());
 
                 survey.start();
 
@@ -129,19 +129,14 @@ public class ParticipantServlet extends HttpServlet {
             }   
             case "getResultSurvey":
             {
-                survey = (Survey) request.getSession().getAttribute("Survey");
-        
-                try {
-                    survey = Survey.GetSurvey(conn, survey.getId().toString());
-                    if (survey == null) {
-                        break;
-                    }
-
-                    survey.start();
-                } catch (SQLException ex) 
-                {
-                    Logger.getLogger(ParticipantServlet.class.getName()).log(Level.SEVERE, null, ex);
+                Participant participant = (Participant) request.getSession().getAttribute("participant");
+                if (participant == null ) {
+                    break;
                 }
+                survey = Survey.getSurvey(participant.getAssembly().getId());
+                survey.getResponses();
+                
+               
                 break;
             }
             case "createSurvey":
@@ -170,14 +165,17 @@ public class ParticipantServlet extends HttpServlet {
                         survey.addResponseChoice(choices[i]);
                     }
                     
+                    //Survey.addSurvey(participant.getAssembly().getId(), survey);
+                    Survey.addSurvey(55545, survey);
                     JsonObject surveyInfo = new JsonObject();
 
                     if (Survey.Insert(conn, survey)) {
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         JsonObject cSurvey = new JsonObject();
-                        System.out.println("sadadafhioaiohsvhiozxihovz");
                         
                         cSurvey.addProperty("createdSurvey", "true");
+                        System.out.println(survey);
+                        System.out.println(survey.getId());
                         cSurvey.addProperty("id_survey", survey.getId().toString());
                         surveyInfo.add("survey", cSurvey);
                         out.println(gson.toJson(surveyInfo));
@@ -186,7 +184,6 @@ public class ParticipantServlet extends HttpServlet {
                     } else {
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         JsonObject cSurvey = new JsonObject();
-                        System.out.println("asdasdsadadafhioaiohsvhioasdazxihovz");
                         cSurvey.addProperty("createdSurvey", "false");
                         surveyInfo.add("survey", cSurvey);
                         out.println(gson.toJson(surveyInfo));
@@ -212,8 +209,8 @@ public class ParticipantServlet extends HttpServlet {
                 
                 survey = participant.getAssembly().getCurrentSurvey();
                 
-                if (survey == null && !participant.getStatus().contains("2")) {
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                if (survey == null && participant.getStatus() < 2) {
+                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "1");
                     out.println(gson.toJson(surveyInfo)); 
@@ -221,8 +218,7 @@ public class ParticipantServlet extends HttpServlet {
                 }
                 
                
-                
-                if (survey == null && participant.getStatus().contains("2")) {
+                if (survey == null && participant.getStatus() >= 2) {
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "2");
@@ -240,7 +236,7 @@ public class ParticipantServlet extends HttpServlet {
                 surveyInfo.addProperty("state", "3");
                 surveyInfo.addProperty("question", survey.getQuestion());
                 surveyInfo.addProperty("choices", survey.getChoices());
-                surveyInfo.addProperty("publicKey", survey.getPublicKey());
+              //  surveyInfo.addProperty("publicKey", survey.getPublicKey());
                 out.println(gson.toJson(surveyInfo));
 
                 break;

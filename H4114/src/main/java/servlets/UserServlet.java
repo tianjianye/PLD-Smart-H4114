@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -153,7 +154,61 @@ public class UserServlet extends HttpServlet {
                 }
                 break;
             }
+            
+            case "getParticipants":
+            {
+                try
+                {
+                    PrintWriter out = response.getWriter();
+                    Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                    conn = DBConnection.Connection();
+                    ArrayList<Participant> participants = Participant.GetParticipants(conn);
+                    JsonObject reponse = new JsonObject();
+                    JsonArray jsonListe = new JsonArray();
+                    for (int i = 0; i < participants.size(); i++)
+                    {
+                        jsonListe.add(participants.get(i).toJson());
+                       
+                    }
+                    reponse.add("Participants", jsonListe);
+                    out.println(gson.toJson(reponse));
+                    
+                } catch (ClassNotFoundException | SQLException | InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
                 
+                
+                
+                
+                break;       
+            }
+            
+            case "getAssemblies":
+            {
+                try
+                {
+                    PrintWriter out = response.getWriter();
+                    Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                    conn = DBConnection.Connection();
+                    ArrayList<Assembly> assemblies = Assembly.GetAssemblies(conn);
+                    JsonObject reponse = new JsonObject();
+                    JsonArray jsonListe = new JsonArray();
+                    for (int i = 0; i < assemblies.size(); i++)
+                    {
+                        jsonListe.add(assemblies.get(i).toJson());
+                       
+                    }
+                    reponse.add("Assemblies", jsonListe);
+                    out.println(gson.toJson(reponse));
+                    
+                } catch (ClassNotFoundException | SQLException | InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+               
+                break;
+            }
+             
+             
             case "joinAssembly":
             {
                 
@@ -168,15 +223,15 @@ public class UserServlet extends HttpServlet {
                     boolean isAlreadyPartAssembly;
                   
                     isAlreadyPartAssembly = User.IsPartAssembly(conn,user);
-                    assembly = Assembly.getAssembly(conn, idAssembly);
+                    assembly = Assembly.getAssembly(conn, Integer.parseInt(idAssembly));
                     if (isAlreadyPartAssembly || participant != null)
                     {
                         break;
                     }
   
-                    String latitude = request.getParameter("latitiude");
-                    String longitiude = request.getParameter("longitude");
-                    String status = request.getParameter("status");
+                    double latitude = Double.parseDouble(request.getParameter("latitiude"));
+                    double longitiude = Double.parseDouble(request.getParameter("longitude"));
+                    int status = Integer.parseInt(request.getParameter("status"));
                 
                     if (user == null)
                     {
@@ -212,7 +267,7 @@ public class UserServlet extends HttpServlet {
                         out.println(gson.toJson(joinAssembly));
                     }
                 }
-            } catch (SQLException | ParseException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
             break;
@@ -233,14 +288,14 @@ public class UserServlet extends HttpServlet {
                 if (participant != null)
                 {
                     
-                    String statusU = participant.getStatus();
+                    int statusU = participant.getStatus();
                     
                     try (PrintWriter out = response.getWriter()) {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         JsonObject parti =new JsonObject();
                         
                         parti.addProperty("psuedo", pseudoU);
-                        parti.addProperty("status", statusU.contains("1"));
+                        parti.addProperty("status", statusU >= 1);
                         getPseudo.add("participate", parti);
                         
                         out.println(gson.toJson(getPseudo));
@@ -273,6 +328,7 @@ public class UserServlet extends HttpServlet {
                     participant = (Participant) request.getSession().getAttribute("participant");
                     if (participant != null)
                     {
+                        System.out.println("123wqwqqwqwqwqwqwqw");
                         break;
                     }
                     
@@ -280,9 +336,9 @@ public class UserServlet extends HttpServlet {
                     String description = request.getParameter("description");  
                     String colour = request.getParameter("colour"); 
                     String date_time = request.getParameter("date_time");
-                    String radio = request.getParameter("radio");
-                    String latitude = request.getParameter("latitude");
-                    String longitude = request.getParameter("longitude");
+                    int radio = Integer.parseInt(request.getParameter("radio"));
+                    double latitude = Double.parseDouble(request.getParameter("latitude"));
+                    double longitude = Double.parseDouble(request.getParameter("longitude"));
                                         
                     
                     Assembly assembly = new Assembly(0, title, description, date_time, radio, colour, latitude, longitude);
@@ -291,6 +347,7 @@ public class UserServlet extends HttpServlet {
                 
                     if (user == null)
                     {
+                        System.out.println("asdwqwqqasdasdwqwqwqwqwqw");
                         break;
                     }
                                    
@@ -298,16 +355,16 @@ public class UserServlet extends HttpServlet {
                             assembly,
                             latitude,
                             longitude,
-                            "2");
+                            2);
 
                     if(Assembly.Insert(conn, assembly)){
-
+                        System.out.println("sadaasdasdasdasdasdasd");
                         try (PrintWriter out = response.getWriter()) {
                             request.getSession().setAttribute("assembly", assembly);
                         }
-
                     }
                     else{
+                        System.out.println("wqwqqwqwqwqwqwqw");
                         break;
                     }
                
