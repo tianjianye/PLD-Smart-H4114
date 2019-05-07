@@ -57,7 +57,9 @@ function getAssemblies()
 
 function getParticipants(callback)
 {
-
+    console.log(callback);
+    var test = callback;
+    console.log(test);
     $.ajax({
             url: './UserServlet',
             method: 'POST',
@@ -69,9 +71,9 @@ function getParticipants(callback)
                 alert("Error while sending new request");
             }
         }).done(function (data) {
-            console.log(data);
-              //  var reponse = jQuery.parseJSON(data.Participants)
-                      //  console.log(reponse);
+            console.log(test);
+            if(callback) callback(data.Participants); 
+             
         });
 }
 
