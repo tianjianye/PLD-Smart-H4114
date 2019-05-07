@@ -5,7 +5,6 @@ package com.insalyon.videostream;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -71,12 +70,9 @@ public class ActionServlet extends HttpServlet {
                 out.println(gson.toJson(jsonResponse));
                 out.close();
             }
+            
         }
     }
-    
-    
-
-
 
     /*public static void printListePersonnes(PrintWriter out, List<Service.Personne> personnes) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -147,5 +143,4 @@ public class ActionServlet extends HttpServlet {
         jsonPersonne.addProperty("dateNaissance", p.getDateNaissance().toString());
         out.println(gson.toJson(jsonPersonne));
     }*/
-   
 }

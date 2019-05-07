@@ -52,12 +52,12 @@ public class ActionServlet extends HttpServlet {
                     JsonObject connection=new JsonObject();
                     JsonObject connect=new JsonObject();
                     conn = DBConnection.Connection();
-                    boolean flag=User.Connect(email, password, conn);
+                    User user = User.Connect(conn, email, password);
                     try (PrintWriter out = response.getWriter()) {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
-                        if(flag){
+                        if(user != null){
                             connect.addProperty("connect", "successful");
-                            request.getSession().setAttribute("email", email);
+                            request.getSession().setAttribute("user", user);
                         }
                         else{
                             connect.addProperty("connect", "failed");
@@ -77,10 +77,11 @@ public class ActionServlet extends HttpServlet {
                 JsonObject inscription=new JsonObject();
                 try {
                     conn = DBConnection.Connection();
-                    boolean exist=User.UserExist(email,pseudo,conn);
+                    boolean exist=User.UserExist(conn, email, pseudo);
                     System.out.println(exist);
                     if(!exist){
-                        if(User.Insert(conn,email,pseudo,password)){
+                        User user = new User(email, password,pseudo);
+                        if(User.Insert(conn,user)){
                             System.out.println("abc");
                             try (PrintWriter out = response.getWriter()) {
                                 Gson gson=new GsonBuilder().setPrettyPrinting().create();
@@ -120,7 +121,7 @@ public class ActionServlet extends HttpServlet {
                     Gson gson=new GsonBuilder().setPrettyPrinting().create();
                     ResultSet rs;
                     conn = DBConnection.Connection();
-                    rs = User.FindUserWithEmail(email, conn);
+                    rs = User.FindUserWithEmail(conn, email);
                     JsonObject jsonCompte=new JsonObject();
                     while (rs.next()){
                         jsonCompte.addProperty("id_user", rs.getString(1));

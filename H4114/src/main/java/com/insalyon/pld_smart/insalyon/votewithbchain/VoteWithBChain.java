@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+/**
 package com.insalyon.votewithbchain;
 
 import com.google.gson.Gson;
@@ -13,10 +14,12 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 
-/**
+
  *
  * @author avianey
  */
+
+/*
 public class VoteWithBChain {
 
     public static ArrayList<Block> blockchain = new ArrayList<Block>(); 
@@ -83,12 +86,6 @@ public class VoteWithBChain {
     {
          sondage.addContestation();
     }
-    
-    
-   
-    
-   
-    
-    
-    
+  
 }
+*/
