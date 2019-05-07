@@ -199,18 +199,33 @@ public class ParticipantServlet extends HttpServlet {
             {
                 // conn = DBConnection.Connection();
                 Participant participant = (Participant) request.getSession().getAttribute("participant");
-                if (participant == null || !participant.getStatus().contains("2")) {
+                if (participant == null) {
                      Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "1");
+                    out.println(gson.toJson(surveyInfo)); 
+                    break;
                 }
+              
+                
                 survey = participant.getAssembly().getCurrentSurvey();
+                
+                if (survey == null && !participant.getStatus().contains("2")) {
+                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    JsonObject surveyInfo = new JsonObject();
+                    surveyInfo.addProperty("state", "1");
+                    out.println(gson.toJson(surveyInfo)); 
+                    break;
+                }
+                
                
                 
-                if (survey == null) {
+                if (survey == null && participant.getStatus().contains("2")) {
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "2");
+                    out.println(gson.toJson(surveyInfo)); 
+                    break;
                 }
                 /*  System.out.println("Public Key:");
                 System.out.println(convertToPublicKey(encodedPublicKey));
