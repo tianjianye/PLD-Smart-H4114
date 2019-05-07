@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -63,6 +64,8 @@ public class UserServlet extends HttpServlet {
                     JsonObject connect=new JsonObject();
                     conn = DBConnection.Connection();
                     user = User.Connect(conn, email, password);
+                    
+                    
                     try (PrintWriter out = response.getWriter()) {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         if(user != null){
@@ -90,7 +93,7 @@ public class UserServlet extends HttpServlet {
                 try {
                     conn = DBConnection.Connection();
                     boolean exist=User.UserExist(conn, email,pseudo);
-                    System.out.println(exist);
+
                     if(!exist){
                         user = new User(email,password, pseudo);
                         if(User.Insert(conn, user)){
@@ -321,10 +324,13 @@ public class UserServlet extends HttpServlet {
             case "createAssembly":
             {  
                 try {
-                    JsonObject createAssembly =new JsonObject();
+                    
                     conn = DBConnection.Connection();
                     
                     user = (User) request.getSession().getAttribute("user");
+                    System.out.println(user.toString());
+                    
+
                     participant = (Participant) request.getSession().getAttribute("participant");
                     if (participant != null)
                     {
@@ -335,7 +341,7 @@ public class UserServlet extends HttpServlet {
                     String title = request.getParameter("title");  
                     String description = request.getParameter("description");  
                     String colour = request.getParameter("colour"); 
-                    String date_time = request.getParameter("date_time");
+                    Date date_time = new Date();
                     int radio = Integer.parseInt(request.getParameter("radio"));
                     double latitude = Double.parseDouble(request.getParameter("latitude"));
                     double longitude = Double.parseDouble(request.getParameter("longitude"));
@@ -343,7 +349,6 @@ public class UserServlet extends HttpServlet {
                     
                     Assembly assembly = new Assembly(0, title, description, date_time, radio, colour, latitude, longitude);
                    
-                    
                 
                     if (user == null)
                     {
@@ -356,41 +361,40 @@ public class UserServlet extends HttpServlet {
                             latitude,
                             longitude,
                             2);
+                    
 
                     if(Assembly.Insert(conn, assembly)){
-                        System.out.println("sadaasdasdasdasdasdasd");
-                        try (PrintWriter out = response.getWriter()) {
                             request.getSession().setAttribute("assembly", assembly);
-                        }
                     }
                     else{
                         System.out.println("wqwqqwqwqwqwqwqw");
                         break;
                     }
                
-
+                PrintWriter out = response.getWriter() ;
                 if(Participant.Insert(conn, participant)){
+                    request.getSession().setAttribute("participant", participant);
                     
-                    try (PrintWriter out = response.getWriter()) {
-                        Gson gson=new GsonBuilder().setPrettyPrinting().create();
-                        JsonObject participate=new JsonObject();
-                        participate.addProperty("created", "true");
-                        createAssembly.add("createAssembly", participate);
-                        out.println(gson.toJson(createAssembly));
-                        
-                        request.getSession().setAttribute("participant", participant);
-                    }
- 
+                    Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                    JsonObject participate=new JsonObject();
+                    JsonObject createAssembly =new JsonObject();
+                    participate.addProperty("created", "true");
+                    createAssembly.add("createAssembly", participate);
+                    out.println(gson.toJson(createAssembly));
+                    
+
                 }
                 else{
-                    try (PrintWriter out = response.getWriter()) {
-                        Gson gson=new GsonBuilder().setPrettyPrinting().create();
-                        JsonObject participate=new JsonObject();
-                        participate.addProperty("created", "false");
-                        createAssembly.add("createAssembly", participate);
-                        out.println(gson.toJson(createAssembly));
-                    }
+                    Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                    JsonObject participate=new JsonObject();
+                    JsonObject createAssembly =new JsonObject();
+                    participate.addProperty("created", "false");
+                    createAssembly.add("createAssembly", participate);
+                    out.println(gson.toJson(createAssembly));
+                    
+                    
                 }
+                out.close();
             } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
