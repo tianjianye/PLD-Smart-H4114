@@ -9,7 +9,7 @@ var listenName;
 
 
 
-const configurationListen = {iceServers: [{urls: 'turn:10.43.7.214:3478',credential: 'test',
+const configurationListen = {iceServers: [{urls: 'turn:10.43.2.185:3478',credential: 'test',
     username: 'test'}]};
 
 function setLocalAndSendMessage(sessionDescription) {

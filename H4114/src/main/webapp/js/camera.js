@@ -11,7 +11,7 @@ var pc;
 
 
 
-const configuration = {iceServers: [/*{urls: 'stun:stun.l.googke.com:19302'}*/{urls: 'turn:10.43.7.214:3479',
+const configuration = {iceServers: [/*{urls: 'stun:stun.l.googke.com:19302'}*/{urls: 'turn:10.43.2.185:3479',
     username: 'test',credential: 'test'}]};
 const constraints = window.constraints = {
   audio: true,
