@@ -65,7 +65,7 @@ function initMap() {
             position: google.maps.ControlPosition.LEFT_BOTTOM
         }});
 
-    var controlDiv = document.createElement('div');
+    /*var controlDiv = document.createElement('div');
 
     // Set CSS for the control border
     var controlUI = document.createElement('div');
@@ -91,8 +91,36 @@ function initMap() {
         newRally();
     });
     controlDiv.index = 1;
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
-
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);*/
+    var rallyDiv = document.createElement('div');
+    var createRallyDiv = document.createElement('div');
+    rallyDiv.class = "dropdown";
+    var createButton = document.createElement('button');
+    createButton.classList.add("btn");
+    createButton.classList.add("btn-primary");
+    createButton.style.width = '130px';
+    console.log(createButton);
+    createButton.innerHTML = 'Create Rally';
+    createButton.onclick = function () {
+        newRally();
+    };
+    var joinRallyDiv = document.createElement('div');
+    joinRallyDiv.id = "joinRally";
+    var joinButton = document.createElement('button');
+    joinButton.innerHTML = 'Join Rally';
+    joinButton.classList.add("btn");
+    joinButton.classList.add("btn-primary");
+    joinButton.style.width = '130px';
+    console.log(joinButton);
+    joinButton.onclick = function () {
+        $("#joinRally").load("joinRally.html");
+    };
+    createRallyDiv.appendChild(createButton);
+    createRallyDiv.appendChild(document.createElement('br'));
+    createRallyDiv.appendChild(joinButton);
+    rallyDiv.appendChild(createRallyDiv);
+    rallyDiv.appendChild(joinRallyDiv);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(rallyDiv);
     var marker = new google.maps.Marker({
         position: location,
         map: map,
