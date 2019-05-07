@@ -133,9 +133,7 @@ public class ParticipantServlet extends HttpServlet {
                 survey = (Survey) request.getSession().getAttribute("Survey");
         
                 try {
-                    survey = Survey.getSurvey(conn, survey.getId().toString());
-            
-        
+                    survey = Survey.GetSurvey(conn, survey.getId().toString());
                     if (survey == null) {
                         break;
                     }
@@ -204,8 +202,7 @@ public class ParticipantServlet extends HttpServlet {
                 if (participant == null || !participant.getStatus().contains("2")) {
                      Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
-                    surveyInfo.addProperty("status", "1");
-                    out.println(gson.toJson(surveyInfo));
+                    surveyInfo.addProperty("state", "1");
                 }
                 survey = participant.getAssembly().getCurrentSurvey();
                
@@ -213,8 +210,7 @@ public class ParticipantServlet extends HttpServlet {
                 if (survey == null) {
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
-                    surveyInfo.addProperty("status", "2");
-                    out.println(gson.toJson(surveyInfo));
+                    surveyInfo.addProperty("state", "2");
                 }
                 /*  System.out.println("Public Key:");
                 System.out.println(convertToPublicKey(encodedPublicKey));
@@ -224,7 +220,7 @@ public class ParticipantServlet extends HttpServlet {
                 
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 JsonObject surveyInfo = new JsonObject();
-                surveyInfo.addProperty("status", "3");
+                surveyInfo.addProperty("state", "3");
                 surveyInfo.addProperty("question", survey.getQuestion());
                 surveyInfo.addProperty("choices", survey.getChoices());
                 surveyInfo.addProperty("publicKey", survey.getPublicKey());

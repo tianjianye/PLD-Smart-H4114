@@ -11,9 +11,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import javax.crypto.Cipher;
+import javax.persistence.Id;
 
 /**
  *
@@ -21,8 +28,19 @@ import javax.crypto.Cipher;
  */
 public final class Block {
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @Id
+    private Integer id;
     private String hash;
     private String previousHash;
+    private Survey survey;
     private byte[] data;
 
     public String getHash() {
@@ -46,12 +64,29 @@ public final class Block {
     }
 
     private final long timeStamp;
+    
+    public Block(Survey survey, String address, String previousHash, byte [] data) {
+        this.survey = survey;
+        this.data = data;
+        this.previousHash = previousHash;
+        this.timeStamp = new Date().getTime();
+        this.hash = calculateHash();
+    }
 
-    public Block(String data, String previousHash, PublicKey pk) {
+    public Block(Survey survey, String data, String previousHash, PublicKey pk) {
+        this.survey = survey;
         this.data = encrypt(data, pk);
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.hash = calculateHash();
+    }
+
+    public Survey getSurvey() {
+        return survey;
+    }
+
+    public void setSurvey(Survey survey) {
+        this.survey = survey;
     }
 
     public byte[] encrypt(String data, PublicKey pk) {
@@ -103,4 +138,60 @@ public final class Block {
         stream.println("Vote : " + this.getData());
 
     }
+    
+    
+    
+    public static boolean Insert(Connection conn, Block block) throws SQLException {
+        //String value="'"+email+"','"+pseudo+"','"+password+"'";
+        //String sql = "insert into participants(idUser,idAssembly,title,description,adresse,date, time)) values(?,?,?,?,?,?,?)";
+        String sql = "insert into blocks(id_survey,address,previousAddress,data)) values(?,?,?,?)";
+        PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); 
+        preparedStatement.setString(1, Integer.toString(block.getSurvey().getId()));
+        preparedStatement.setString(2, block.getHash());
+        preparedStatement.setString(3, block.getPreviousHash());
+        preparedStatement.setString(4, block.getDataString());
+        
+
+        int flag = preparedStatement.executeUpdate();
+
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                block.setId(generatedKeys.getInt(1));
+            } else {
+                throw new SQLException("Creating user failed, no ID obtained.");
+            }
+        }
+
+        if (flag != -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public static ArrayList<Block> GetBlocks(Connection conn, Survey survey) throws SQLException {
+        //String value="'"+email+"','"+pseudo+"','"+password+"'";
+        //String sql = "insert into participants(idUser,idAssembly,title,description,adresse,date, time)) values(?,?,?,?,?,?,?)";
+        ArrayList<Block> blocks = new ArrayList<>();
+        String sql="select * from blocks where id_survey = ? ";
+        PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);    
+        stmt.setInt(1,survey.getId()); 
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        
+        while(rs.next())
+        {
+            Integer id = rs.getInt("id_block");
+            String address =  rs.getString("address");
+            String pAddress = rs.getString("previousAddress");
+            byte [] data = rs.getBytes("data");
+            
+            Block block = new Block(survey, address, pAddress, data);
+            blocks.add(block);
+        }
+
+        return blocks;
+    }
+    
 }

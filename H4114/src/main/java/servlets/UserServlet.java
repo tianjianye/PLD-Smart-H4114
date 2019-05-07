@@ -279,15 +279,14 @@ public class UserServlet extends HttpServlet {
                     String title = request.getParameter("title");  
                     String description = request.getParameter("description");  
                     String colour = request.getParameter("colour"); 
-                    String date = request.getParameter("date");
-                    String place = request.getParameter("place");
+                    String date_time = request.getParameter("date_time");
                     String radio = request.getParameter("radio");
+                    String latitude = request.getParameter("latitude");
+                    String longitude = request.getParameter("longitude");
+                                        
                     
-                    Assembly assembly = new Assembly(0, title, description, place, date, radio, colour);
-                    
-  
-                    String latitude = request.getParameter("latitiude");
-                    String longitiude = request.getParameter("longitude");
+                    Assembly assembly = new Assembly(0, title, description, date_time, radio, colour, latitude, longitude);
+                   
                     
                 
                     if (user == null)
@@ -298,7 +297,7 @@ public class UserServlet extends HttpServlet {
                     participant = new Participant(  user,
                             assembly,
                             latitude,
-                            longitiude,
+                            longitude,
                             "2");
 
                     if(Assembly.Insert(conn, assembly)){
