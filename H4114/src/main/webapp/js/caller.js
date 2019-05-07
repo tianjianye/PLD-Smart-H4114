@@ -13,10 +13,10 @@ var index = 0;
 
 
 
-const configuration = {iceServers: [{urls: 'turn:10.43.7.214:3478',credential: 'test',
+const configuration = {iceServers: [{urls: 'turn:10.43.4.30:3478',credential: 'test',
     username: 'test'}]};
 const constraints = window.constraints = {
-  audio: false,
+  audio: true,
   video: true
 };
 
@@ -67,7 +67,7 @@ function errorMsg(msg, error) {
 }
 
 function connectStart(number){
-    socket = new WebSocket("wss://192.168.137.1:8443/H4114/video/"+number+"/start/" + name);
+    socket = new WebSocket("ws://192.168.137.1:8084/H4114/video/"+number+"/start/" + name);//wss://192.168.137.1:8443/H4114/video/"+number+"/start/" + name
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
     };
