@@ -15,16 +15,16 @@
 
   /* Style the links inside the navigation bar */
   .navbar a {
-    width: 16%;
+    width: 12%;
     height: 100%;
     align-content: center;
     float: left;
     display: block;
     color: black;
     text-align: center;
-    padding: 14px 16px;
+    padding: 7px 10px;
     text-decoration: none;
-    font-size: 26px;
+    font-size: 15px;
     font-family: Arial, Helvetica, sans-serif;
   }
   
@@ -43,19 +43,13 @@
   #content {
       height: 88%;
       width: 100%;
-      font-size: 40px;
+      font-size: 25px;
       font-family: Arial, Helvetica, sans-serif;
       vertical-align: middle;
   }
 
-  #content div {
-    text-align: center;
-    height: 100%;
-    width: 100%;
-}
-
 .style {
-    font-size: 30px;
+    font-size: 25px;
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
 }
@@ -73,7 +67,7 @@
 
 #content a {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 25px;
+    font-size: 20px;
     color: black;
     background-color: white;
 }
