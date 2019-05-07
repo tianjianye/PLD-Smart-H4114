@@ -58,6 +58,21 @@ function stop() {
     });
 }
 
+function stopCaller() {
+    const video = document.getElementById('video');
+    video.pause();
+    video.srcObject = null;
+    video.src = "";
+    localStream.getTracks().forEach(function(track) {
+        track.stop();
+    });
+    socket.close();
+    pcs = [];
+    listeners = [];
+    index = 0;
+    identity = 'none';
+}
+
 function errorMsg(msg, error) {
     const errorElement = document.querySelector('#errorMsg');
     errorElement.innerHTML += `<p>${msg}</p>`;
@@ -68,8 +83,10 @@ function errorMsg(msg, error) {
 
 function connectStart(number){
     socket = new WebSocket("wss://192.168.137.1:8443/H4114/video/"+number+"/start/" + name);
+    identity = 'caller';
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
+        buttonControl('State4');
     };
     socket.onerror = function (event) {
         console.log(event);
@@ -111,10 +128,6 @@ function connectStart(number){
         }
     };
     socket.onclose = function (event) {
-        sendMessage({
-            user : 'start',
-            type : 'bye'
-        });
         console.log("/!\\ Déconnexion serveur");
     };
 }

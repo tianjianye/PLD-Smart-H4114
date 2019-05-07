@@ -19,9 +19,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.websocket.server.PathParam;
-import com.google.gson.JsonObject;
+import org.json.JSONObject;
 import model.Participant;
-import org.json.simple.JSONObject;
 /**
  *
  * @author scheah
@@ -29,9 +28,7 @@ import org.json.simple.JSONObject;
 
 @ServerEndpoint(value = "/video/{room}/{usertype}/{username}")
 public class ServerEndPoint {
-   
-    
-    
+    private Participant participant;
     private Session session;
     private String roomNumber;
     private String name;
@@ -90,7 +87,7 @@ public class ServerEndPoint {
  
     @OnMessage
     public String onMessage(String message, Session session) throws IOException {
-        /*JSONObject json = new JSONObject(message);
+        JSONObject json = new JSONObject(message);
         if (json != null) {
             String userType = json.getString("user");
             String type = json.getString("type");
@@ -132,7 +129,7 @@ public class ServerEndPoint {
             }else if ("alive".equals(type)){
                 System.out.println(session.getId()+" is alive.");
             }
-        } */
+        } 
         return message;
     }
  

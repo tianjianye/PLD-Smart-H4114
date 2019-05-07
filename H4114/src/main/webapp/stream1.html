@@ -36,7 +36,7 @@
     <br/>
     <div class="btn-group" role="group" aria-label="Basic example" style="align-content:center">
         <button id="start" class="btn btn-success btn-lg">Start</button>
-        <button id="stop" class="btn btn-danger btn-lg">Stop</button>
+        <button id="stop" class="btn btn-danger btn-lg">Close</button>
     </div>
 </div>
 
@@ -44,6 +44,7 @@
 
 <script>
     var name = '';
+    var identity = 'none';
     function recordName(){
         var champNom = $('#name').val();
         name = champNom;
@@ -124,7 +125,6 @@
         });
     }
 
-
     $(document).ready(function () {
         $.ajax({
             url: './ParticipantServlet',
@@ -142,24 +142,68 @@
             console.log(response);
             var chambers = response.rooms;
             getRoomInfos(chambers);
+            buttonControl('State1');
             $('#recordName').on('click', function () {
                 recordName();
+                buttonControl('State2');
             });
             $('#createRoom').on('click', function () {
-                startRoom();
+                if(document.getElementById("start").disabled === false){
+                    alert("Please open your camera before create a room.");
+                }else{
+                    startRoom();
+                }
             });
             $('#refresh').on('click', function () {
                 refreshInfos();
             });
             $('#start').on('click', function () {
                 start();
+                buttonControl('State3');
                 console.log('Camera started');
             });
             $('#stop').on('click', function () {
-                stop();
+                if(identity === 'None'){
+                    stop();
+                }else if(identity === 'caller'){
+                    stopCaller();
+                }else if(identity === 'receiver'){
+                    stopReceiver();
+                }
+                buttonControl('State2');
                 console.log('Camera stopped');
             });
         });
     });
-
+    
+    function buttonControl(state){
+        switch (state) {
+            case 'State1':
+                document.getElementById("start").disabled=true; 
+                document.getElementById("stop").disabled=true; 
+                document.getElementById("createRoom").disabled=true; 
+                document.getElementById("recordName").disabled=false; 
+                break;
+            case 'State2':
+                document.getElementById("start").disabled=false; 
+                document.getElementById("stop").disabled=true; 
+                document.getElementById("createRoom").disabled=false; 
+                document.getElementById("recordName").disabled=true; 
+                break;
+            case 'State3':
+                document.getElementById("start").disabled=true; 
+                document.getElementById("stop").disabled=true; 
+                document.getElementById("createRoom").disabled=false; 
+                document.getElementById("recordName").disabled=true; 
+                break;
+            case 'State4':
+                document.getElementById("start").disabled=true; 
+                document.getElementById("stop").disabled=false; 
+                document.getElementById("createRoom").disabled=true; 
+                document.getElementById("recordName").disabled=true; 
+                break;   
+            default:
+              console.log('Sorry, we are out of ' + state + '.');
+          }
+    }
 </script>
