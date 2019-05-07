@@ -15,12 +15,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.persistence.Id;
+import service.Util;
 
 /**
  *
  * @author avianey
  */
 public class Assembly {
+
 
     @Id
     private Integer id;
@@ -35,18 +37,18 @@ public class Assembly {
     private long latitiude;
     private long longitude;
 
-    public Assembly(Integer id, String title, String description, String place, String date, String radio) throws ParseException {
+    public Assembly(Integer id, String title, String description, String place, String date, String radio, String colour) {
         this.id = id;
         this.currentSurvey = null;
         this.colour = "red";
         this.radio = Integer.parseInt(radio);
 
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-        this.date = format.parse(date);
+        this.date = Util.StringToDate(date);
 
         this.title = title;
         this.description = description;
 
+        this.colour = colour;
         this.place = place;
         // this.latitiude = getlat
 
@@ -158,7 +160,8 @@ public class Assembly {
                     rs.getString("description"),
                     rs.getString("place"),
                     rs.getString("date"),
-                    rs.getString("radio")
+                    rs.getString("radio"),
+                    rs.getString("colour")
             );
 
             String idSurvey = rs.getString("id_survey");
@@ -169,6 +172,34 @@ public class Assembly {
         }
 
         return null;
+    }
+    
+    public static boolean Insert(Connection conn, Assembly assembly) throws SQLException {
+        
+        String sql = "insert into assemblies(title,description,place,date,radio,colour)) values(?,?,?,?,?,?)";
+        PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        preparedStatement.setString(1, assembly.getTitle());
+        preparedStatement.setString(2, assembly.getDescription());
+        preparedStatement.setString(3, assembly.getPlace());
+        preparedStatement.setString(4, Util.DateToString(assembly.getDate()));
+        preparedStatement.setString(5, Integer.toString(assembly.getRadio()));
+        preparedStatement.setString(6, assembly.getColour());
+
+        int flag = preparedStatement.executeUpdate();
+
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                assembly.setId(generatedKeys.getInt(1));
+            } else {
+                throw new SQLException("Creating user failed, no ID obtained.");
+            }
+        }
+
+        if (flag != -1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

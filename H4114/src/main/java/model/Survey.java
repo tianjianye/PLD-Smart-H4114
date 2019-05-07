@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -318,7 +319,7 @@ public class Survey {
     public static boolean Insert(Connection conn, Survey survey) throws SQLException{
             //String value="'"+email+"','"+pseudo+"','"+password+"'";
             String sql = "insert into surveys(question,choices,time, publicKey, privateKey) values(?,?,?,?,?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);   
+            PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);      
             preparedStatement.setString(1, survey.getQuestion()); 
             preparedStatement.setString(2, survey.getChoices());
             preparedStatement.setString(3, survey.getTimeMillis());

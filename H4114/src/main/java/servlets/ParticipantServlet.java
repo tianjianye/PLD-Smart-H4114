@@ -140,8 +140,6 @@ public class ParticipantServlet extends HttpServlet {
                         survey.addResponseChoice(choices[i]);
                     }
                     
-                   request.getSession().setAttribute("survey", survey);
-
                     JsonObject surveyInfo = new JsonObject();
 
                     if (Survey.Insert(conn, survey)) {
@@ -153,6 +151,8 @@ public class ParticipantServlet extends HttpServlet {
                             cSurvey.addProperty("id_survey", survey.getId().toString());
                             surveyInfo.add("survey", cSurvey);
                             out.println(gson.toJson(surveyInfo));
+                            
+                            request.getSession().setAttribute("survey", survey);
                         }
                     } else {
                         try (PrintWriter out = response.getWriter()) {

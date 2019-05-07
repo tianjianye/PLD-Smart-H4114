@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.persistence.Id;
 
 /**
@@ -78,7 +79,7 @@ public class Participant {
         //String value="'"+email+"','"+pseudo+"','"+password+"'";
         //String sql = "insert into participants(idUser,idAssembly,title,description,adresse,date, time)) values(?,?,?,?,?,?,?)";
         String sql = "insert into participants(idUser,idAssembly,status,lat,long)) values(?,?,?,?,?)";
-        PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); 
         preparedStatement.setString(1, participant.getUser().getId().toString());
         preparedStatement.setString(2, participant.getAssembly().getId().toString());
         preparedStatement.setString(3, participant.getStatus());

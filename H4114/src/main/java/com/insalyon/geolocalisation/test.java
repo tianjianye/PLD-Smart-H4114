@@ -9,6 +9,4 @@ package com.insalyon.geolocalisation;
  *
  * @author scheah
  */
-public class test {
-    
-}
+

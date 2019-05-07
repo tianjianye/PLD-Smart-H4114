@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.persistence.Id;
 
 /**
@@ -64,7 +65,7 @@ public class User {
     public static boolean Insert(Connection conn, User user) throws SQLException{
             //String value="'"+email+"','"+pseudo+"','"+password+"'";
             String sql = "insert into users(email,pseudo,password) values(?,?,?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);   
+            PreparedStatement preparedStatement = conn.prepareStatement(sql,  Statement.RETURN_GENERATED_KEYS);   
             preparedStatement.setString(1, user.getEmail()); 
             preparedStatement.setString(2, user.getPseudo()); 
             preparedStatement.setString(3, user.getPassword());
