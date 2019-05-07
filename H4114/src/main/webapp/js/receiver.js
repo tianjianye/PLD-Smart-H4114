@@ -34,10 +34,11 @@ function stopReceiver() {
 
 function connectListen(number, name){
     listenName = name;
-    socketListen = new WebSocket("ws://192.168.137.1:8084/H4114/video/" + number + "/listen/" + name);//"wss://192.168.137.1:8443/H4114/video/" + number + "/listen/" + name
+    socketListen = new WebSocket("wss://192.168.137.1:8443/H4114/video/" + number + "/listen/" + name);
     identity = 'receiver';
     socketListen.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
+        buttonControl('State4');
     };
     socketListen.onerror = function (event) {
         console.log(event);
@@ -56,10 +57,6 @@ function connectListen(number, name){
         }
     };
     socketListen.onclose = function (event) {
-        sendMessageListen({
-            user : 'start',
-            type : 'bye'
-        });
         console.log("/!\\ Déconnexion serveur");
     };
 }

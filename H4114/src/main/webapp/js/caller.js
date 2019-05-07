@@ -86,6 +86,7 @@ function connectStart(number){
     identity = 'caller';
     socket.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
+        buttonControl('State4');
     };
     socket.onerror = function (event) {
         console.log(event);
@@ -127,10 +128,6 @@ function connectStart(number){
         }
     };
     socket.onclose = function (event) {
-        sendMessage({
-            user : 'start',
-            type : 'bye'
-        });
         console.log("/!\\ Déconnexion serveur");
     };
 }
