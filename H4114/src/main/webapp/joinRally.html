@@ -22,6 +22,26 @@
 </div>
 <script>
 $(document).ready(function () {
+    $('#join').on('click', function () {
+        var radioValue = $("input[name='rallies']:checked").val();
+        console.log(radioValue);
+        if(radioValue){
+            $.ajax({
+                url: './UserServlet',
+                method: 'POST',
+                data: {
+                    action : 'joinAssembly',
+                    id_assembly : radioValue,
+                    status : 0,
+                    latitude :latitude,
+                    longitude: longitude
+                },
+                dataType: 'json'
+            });
+        } else {
+            $("#errorMsg").innerHTML("Please select a value!");
+        }
+    });
     $.ajax({
         url: './UserServlet',
         method: 'POST',
@@ -49,23 +69,6 @@ $(document).ready(function () {
             ralliesDiv.appendChild(radioLabel);
             ralliesDiv.appendChild(document.createElement('br'));
         }
-        var joinButton = document.getElementById("join");
-        joinButton.onclick = function(){
-            var radioValue = $("input[name='rallies']:checked").val();
-            if(radioValue){
-                $.ajax({
-                    url: './ParticipantServlet',
-                    method: 'POST',
-                    data: {
-                        action : 'joinAssembly',
-                        id_assembly : radioValue
-                    },
-                    dataType: 'json'
-                });
-            } else {
-                $("#errorMsg").innerHTML("Please select a value!");
-            }
-        };
     });
 });
 </script>

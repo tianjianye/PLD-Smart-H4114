@@ -51,7 +51,7 @@ function createAssembly() {
             },
             dataType: 'json',
             error: function () {
-                alert("Error while sending new rally request");
+                console.log("Error while sending new rally request");
             }
         }).done(function (data) {
             var reponse = data.createRally;

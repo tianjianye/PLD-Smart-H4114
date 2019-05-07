@@ -3,10 +3,6 @@ var positions = [];
 var markers = [];
 var assemblyTable = [];
 
-
-
-setInterval()
-
 function createPositions() {
 
     getParticipants();
@@ -51,7 +47,7 @@ function setPosition(position) {
 }
 
 var latitude;
-var logitude;
+var longitude;
 //var user = getQueryVariable("user");
 
 function newAssembly() {

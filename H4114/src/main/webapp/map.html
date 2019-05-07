@@ -1,8 +1,9 @@
 <div>
+<!--<p id="demo" style="height: 30px; width: 100%;"></p>-->
+
+<div id="map" style="height: 100%; width: 100%;"></div> 
     
-    <!--<p id="demo" style="height: 30px; width: 100%;"></p>-->
-    <div id="map" style="height: 100%; width: 100%;"></div>
-    <div id="createAssembly" style="display: none;">
+<div id="createAssembly" style="display: none;">
 
         <form action="#" class="was-validated">
             <div class="form-group">
@@ -14,32 +15,17 @@
                 <input type="text" class="form-control" id="description" placeholder="Description" required>
             </div>
             <div class="form-group">
-                <label for="place">Place</label>
-                <input type="text" class="form-control" id="place" placeholder="Where the rally is ?" required>
-            </div>
-            <div class="form-group">
-                <label for="date">Date</label>
-                <input type="date" class="form-control" id="date" placeholder="When ?" required>
-            </div>
-            <div class="form-group">
-                <label for="time">Hour</label>
-                <input type="time" class="form-control" id="time" placeholder="What time ?" required>
-            </div>
-            <div class="form-group">
                 <label for="radio"></label>
-                <input type="number" class="form-control" id="radio" placeholder="Roughly rally's radio in meters" required>
+                <input type="number" class="form-control" id="radio" placeholder="Rayon minimal (en mètres)" required>
             </div>
             <div class="form-group">
-                <label for="email"></label>
-                <input type="email" class="form-control" id="email" placeholder="Confirm email" required>
-            </div>
-            <div class="form-group">
-                <label for="password"></label>
-                <input type="password" class="form-control" id="password" placeholder="Confirm password" required>
+                <label for="colour"></label>
+                <input type="color" class="form-control" id="colour" required>
             </div>
             <!--valider : vérifie si un rassemblement prévu est proche (en date et lieu)-->
             <span id="message" style="color:red"></span>
             <br>
+            
             <button class="button" onclick="createAssembly()">Create</button>
             <span id="message" style="color:red"></span>
         </form>

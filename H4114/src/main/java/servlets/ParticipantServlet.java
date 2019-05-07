@@ -101,6 +101,7 @@ public class ParticipantServlet extends HttpServlet {
                     if (survey == null) {
                         break;
                     }
+                    System.err.println("askonfoaso");
                     String reponse = request.getParameter("response");
                     String address = survey.addAnswerVote(reponse);
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -165,8 +166,7 @@ public class ParticipantServlet extends HttpServlet {
                         survey.addResponseChoice(choices[i]);
                     }
                     
-                    //Survey.addSurvey(participant.getAssembly().getId(), survey);
-                    Survey.addSurvey(55545, survey);
+                    Survey.addSurvey(participant.getAssembly().getId(), survey);
                     JsonObject surveyInfo = new JsonObject();
 
                     if (Survey.Insert(conn, survey)) {
@@ -198,19 +198,24 @@ public class ParticipantServlet extends HttpServlet {
             {
                 // conn = DBConnection.Connection();
                 Participant participant = (Participant) request.getSession().getAttribute("participant");
+                
                 if (participant == null) {
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
-                    surveyInfo.addProperty("state", "1");
+                    surveyInfo.addProperty("state", "-1");
                     out.println(gson.toJson(surveyInfo)); 
                     break;
                 }
               
                 
-                survey = participant.getAssembly().getCurrentSurvey();
+                survey = Survey.getSurvey(participant.getAssembly().getId());
+                System.out.println(participant);
+                System.out.println(participant.getAssembly());
+                System.out.println(participant.getAssembly().getId());
                 
                 if (survey == null && participant.getStatus() < 2) {
-                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    System.out.println(survey);
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject surveyInfo = new JsonObject();
                     surveyInfo.addProperty("state", "1");
                     out.println(gson.toJson(surveyInfo)); 

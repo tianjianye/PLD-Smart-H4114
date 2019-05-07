@@ -48,7 +48,7 @@ function getAssemblies()
             },
             dataType: 'json',
             error: function () {
-                alert("Error while sending new request");
+                console.log("GetAssemblies : Error while sending new request");
             }
         }).done(function (data) {
            
@@ -66,7 +66,7 @@ function getParticipants(callback)
             },
             dataType: 'json',
             error: function () {
-                alert("Error while sending new request");
+                console.log("GetParticipants : Error while sending new request");
             }
         }).done(function (data) {
             console.log(data);
