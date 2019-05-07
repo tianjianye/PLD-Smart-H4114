@@ -7,8 +7,6 @@ var socketListen;
 var pcListen;
 var listenName;
 
-
-
 const configurationListen = {iceServers: [{urls: 'turn:10.43.2.185:3478',credential: 'test',
     username: 'test'}]};
 
@@ -25,9 +23,19 @@ function errorMsg(msg, error) {
     }
 }
 
+function stopReceiver() {
+    const video = document.getElementById('video');
+    video.pause();
+    video.srcObject = null;
+    video.src = "";
+    socketListen.close();
+    identity = 'none';
+}
+
 function connectListen(number, name){
     listenName = name;
     socketListen = new WebSocket("ws://192.168.137.1:8084/H4114/video/" + number + "/listen/" + name);//"wss://192.168.137.1:8443/H4114/video/" + number + "/listen/" + name
+    identity = 'receiver';
     socketListen.onopen = function (event) {
         console.log("/!\\ Connexion serveur");
     };
