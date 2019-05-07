@@ -34,6 +34,7 @@ public class Participant {
         this.longitude = longitude;
         this.assembly = assembly;
         this.user = user;
+        
 
     }
 
@@ -90,12 +91,13 @@ public class Participant {
     
 
     public static boolean Insert(Connection conn, Participant participant) throws SQLException {
+        System.out.println(participant.getUser().getId());
         //String value="'"+email+"','"+pseudo+"','"+password+"'";
         //String sql = "insert into participants(idUser,idAssembly,title,description,adresse,date, time)) values(?,?,?,?,?,?,?)";
-        String sql = "insert into participants(idUser,idAssembly,status,lat,long)) values(?,?,?,?,?)";
+        String sql = "insert into participants(id_user,id_assembly,status,latitude,longitude) values(?,?,?,?,?)";
         PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); 
-        preparedStatement.setString(1, participant.getUser().getId().toString());
-        preparedStatement.setString(2, participant.getAssembly().getId().toString());
+        preparedStatement.setInt(1, participant.getUser().getId());
+        preparedStatement.setInt(2, participant.getAssembly().getId());
         preparedStatement.setInt(3, participant.getStatus());
         preparedStatement.setDouble(4, participant.getLatitude());
         preparedStatement.setDouble(5, participant.getLongitude());

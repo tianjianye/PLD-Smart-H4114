@@ -99,8 +99,9 @@ public class User {
             User user = new User( 
                   rs.getString("email"),
                   rs.getString("password"),
-                  rs.getString("pseudo") 
+                  rs.getString("pseudo")
           );
+            user.setId(rs.getInt("id_user"));
             
             return user;  
         } 
@@ -123,6 +124,7 @@ public class User {
                       rs.getString("password"),
                       rs.getString("pseudo") 
                 );
+                
                 user.setId(idU);
 
                 return user;  

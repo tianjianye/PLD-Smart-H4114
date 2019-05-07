@@ -38,7 +38,7 @@ public class Assembly {
     private double latitude;
     private double longitude;
 
-    public Assembly(Integer id, String title, String description,String date, int radio, String colour, double latitude, double longitude) {
+    public Assembly(Integer id, String title, String description,Date date, int radio, String colour, double latitude, double longitude) {
         this.id = id;
         this.currentSurvey = null;
         this.colour = "red";
@@ -46,7 +46,7 @@ public class Assembly {
         this.latitude = latitude;
         this.longitude = longitude;
 
-        this.date = Util.StringToDate(date);
+        this.date = date;
 
         this.title = title;
         this.description = description;
@@ -178,7 +178,7 @@ public class Assembly {
                    idAssembly,
                     rs.getString("title"),
                     rs.getString("description"),
-                    rs.getString("date_time"),
+                    Util.StringToDate(rs.getString("date_time")),
                     rs.getInt("radio"),
                     rs.getString("colour"),
                     rs.getDouble("latitude"),
@@ -195,15 +195,15 @@ public class Assembly {
     
     public static boolean Insert(Connection conn, Assembly assembly) throws SQLException {
         
-        String sql = "insert into assemblies(title,description,place,date_time,radio,colour,latitude, longitude)) values(?,?,?,?,?,?,?,?)";
+        String sql = "insert into assemblies(title,description,date_time,radio,colour,latitude, longitude) values(?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = conn.prepareStatement(sql,  Statement.RETURN_GENERATED_KEYS); 
         preparedStatement.setString(1, assembly.getTitle());
         preparedStatement.setString(2, assembly.getDescription());
-        preparedStatement.setString(4, Util.DateToString(assembly.getDate()));
-        preparedStatement.setInt(5, assembly.getRadio());
-        preparedStatement.setString(6, assembly.getColour());
-        preparedStatement.setDouble(7, assembly.getLatitude());
-        preparedStatement.setDouble(8, assembly.getLongitude());
+        preparedStatement.setString(3, Util.DateToString(assembly.getDate()));
+        preparedStatement.setInt(4, assembly.getRadio());
+        preparedStatement.setString(5, assembly.getColour());
+        preparedStatement.setDouble(6, assembly.getLatitude());
+        preparedStatement.setDouble(7, assembly.getLongitude());
 
         int flag = preparedStatement.executeUpdate();
 
@@ -220,7 +220,7 @@ public class Assembly {
         } else {
             return false;
         }
-    }
+}
     
     public static ArrayList<Assembly> GetAssemblies(Connection conn) throws SQLException {
         //String value="'"+email+"','"+pseudo+"','"+password+"'";
@@ -236,7 +236,7 @@ public class Assembly {
                     rs.getInt("id_assembly"),
                     rs.getString("title"),
                     rs.getString("description"),
-                    rs.getString("date_time"),
+                    Util.StringToDate(rs.getString("date_time")),
                     rs.getInt("radio"),
                     rs.getString("colour"),
                     rs.getDouble("latitude"),

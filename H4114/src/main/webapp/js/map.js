@@ -12,31 +12,16 @@ function getQueryVariable(variable)
 }
 ;
 
-document.getElementById("createRally").hidden = true;
+
 
 var user = getQueryVariable("user");
-var latitude;
-var longitude;
 
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else {
-        alert("Geolocation is not supported by this browser");
-    }
-}
-
-function showPosition(position) {
-    latitude = position.coords.latitude;
-    longitude = position.coords.longitude;
-}
-
-function newRally() {
-    document.getElementById("createRally").hidden = false;
+function newAssembly() {
+    document.getElementById("createAssembly").style.display = "block";
 }
 
 
-function createRally() {
+function createAssembly() {
     $('#message').text("");
     var rally = $('#rally').val();
     var description = $('#description').val();
