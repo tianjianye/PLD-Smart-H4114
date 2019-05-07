@@ -78,36 +78,80 @@ function createRally() {
     }
 }
 
-var k;
-/*
-window.setInterval(function () {
-    getLocation();
-    k=k+1;
-    latitude = latitude+k;
-    longitude = longitude-k;
-    $.ajax({
-        url: './ActionServlet',
-        method: 'POST',
-        data: {
-            action: 'assemblies',
-            latitude: latitude,
-            longitude: longitude,
-            user: user
-        },
-        dataType: 'json',
-        error: function () {
-            alert("Error while sending assemblies request");
-        }
-    }).done(function (data) {
-        var reponse = data.assemblies;
-        if (reponse.assemblies) {
+function initMap() {
 
-            //clearInterval() to finish repetating
+    var marker;
+    var map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 19,
+        scaleControl: false,
+        fullscreenControl: false,
+        zoomControl: false,
+        center: {lat: 45.78165420692724, lng: 4.872048616873495},
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            mapTypeIds: ['roadmap', 'satellite'],
+            position: google.maps.ControlPosition.LEFT_BOTTOM
+        }});
 
-        } else {
-            $('#message').text("Ups we didn't succed to verify rally creation");
-        }
+    var marker = new google.maps.Marker({
+        map: map,
+        icon: {url: "./icons/man-red-user.png"}
     });
-}, 10000);
-*/
+
+    var controlDiv = document.createElement('div');
+
+    // Set CSS for the control border
+    var controlUI = document.createElement('div');
+    controlUI.style.backgroundColor = 'red';
+    controlUI.style.border = '2px solid #fff';
+    controlUI.style.cursor = 'pointer';
+    controlUI.style.marginTop = '22px';
+    controlUI.style.marginLeft = '22px';
+    controlUI.style.textAlign = 'center';
+    controlUI.title = 'Click to recenter the map';
+    controlDiv.appendChild(controlUI);
+    // Set CSS for the control interior
+    var controlText = document.createElement('div');
+    controlText.style.color = 'rgb(255,255,255)';
+    controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+    controlText.style.fontSize = '16px';
+    controlText.style.lineHeight = '38px';
+    controlText.style.paddingLeft = '5px';
+    controlText.style.paddingRight = '5px';
+    controlText.innerHTML = 'New Rally';
+    controlUI.appendChild(controlText);
+    controlUI.addEventListener('click', function () {
+        newRally();
+    });
+    controlDiv.index = 1;
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
+
+    //infoWindow = new google.maps.InfoWindow;
+    /*function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+     infoWindow.setPosition(pos);
+     infoWindow.setContent(browserHasGeolocation ?
+     'Error: The Geolocation service failed.' :
+     'Error: Your browser doesn\'t support geolocation.');
+     infoWindow.open(map);
+     }*/
+    // handleLocationError(false, infoWindow, map.getCenter());
+    //handleLocationError(true, infoWindow, map.getCenter());
+    window.setInterval(function () {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                pos = {lat: position.coords.latitude,
+                    lng: position.coords.longitude};
+
+                var myLatlng = new google.maps.LatLng(pos.lat, pos.lng);
+                marker.setPosition(myLatlng);
+
+            }, function () {
+                Console.log("The geolocation service failed");
+            });
+        } else {
+            Console.log("Browser doesn't support geolocation");
+        }
+    }, 5000);
+}
 
