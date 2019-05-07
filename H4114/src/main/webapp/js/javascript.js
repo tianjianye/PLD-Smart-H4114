@@ -55,7 +55,7 @@ function getAssemblies()
         });
 }
 
-function getParticipants()
+function getParticipants(callback)
 {
 
     $.ajax({
@@ -69,7 +69,9 @@ function getParticipants()
                 alert("Error while sending new request");
             }
         }).done(function (data) {
-           
+            console.log(data);
+              //  var reponse = jQuery.parseJSON(data.Participants)
+                      //  console.log(reponse);
         });
 }
 
