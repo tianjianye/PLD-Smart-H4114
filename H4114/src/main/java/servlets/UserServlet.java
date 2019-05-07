@@ -214,7 +214,6 @@ public class UserServlet extends HttpServlet {
              
             case "joinAssembly":
             {
-                
                 try {
                     JsonObject joinAssembly =new JsonObject();
                     conn = DBConnection.Connection();
@@ -229,10 +228,12 @@ public class UserServlet extends HttpServlet {
                     assembly = Assembly.getAssembly(conn, Integer.parseInt(idAssembly));
                     if (isAlreadyPartAssembly || participant != null)
                     {
+                        System.out.println(user.getId());
+                        System.out.println(isAlreadyPartAssembly);
                         break;
                     }
   
-                    double latitude = Double.parseDouble(request.getParameter("latitiude"));
+                    double latitude = Double.parseDouble(request.getParameter("latitude"));
                     double longitiude = Double.parseDouble(request.getParameter("longitude"));
                     int status = Integer.parseInt(request.getParameter("status"));
                 
@@ -249,15 +250,14 @@ public class UserServlet extends HttpServlet {
 
                 if(Participant.Insert(conn, participant)){
                     
-                    try (PrintWriter out = response.getWriter()) {
-                        Gson gson=new GsonBuilder().setPrettyPrinting().create();
-                        JsonObject participate=new JsonObject();
-                        participate.addProperty("participate", "true");
-                        joinAssembly.add("participate", participate);
-                        out.println(gson.toJson(joinAssembly));
-                        
-                        request.getSession().setAttribute("participant", participant);
-                    }
+                    PrintWriter out = response.getWriter();
+                    Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                    JsonObject participate=new JsonObject();
+                    participate.addProperty("participate", "true");
+                    joinAssembly.add("participate", participate);
+                    out.println(gson.toJson(joinAssembly));
+                    System.out.println(participant.toJson());
+                    request.getSession().setAttribute("participant", participant);
                     
                     
                 }
@@ -297,7 +297,7 @@ public class UserServlet extends HttpServlet {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         JsonObject parti =new JsonObject();
                         
-                        parti.addProperty("psuedo", pseudoU);
+                        parti.addProperty("pseudo", pseudoU);
                         parti.addProperty("status", statusU >= 1);
                         getPseudo.add("participate", parti);
                         
@@ -351,6 +351,7 @@ public class UserServlet extends HttpServlet {
                 
                     if (user == null)
                     {
+                        System.out.println("asdwqwqqasdasdwqwqwqwqwqw");
                         break;
                     }
                                    
@@ -365,6 +366,7 @@ public class UserServlet extends HttpServlet {
                             request.getSession().setAttribute("assembly", assembly);
                     }
                     else{
+                        System.out.println("wqwqqwqwqwqwqwqw");
                         break;
                     }
                

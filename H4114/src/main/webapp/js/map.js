@@ -35,22 +35,23 @@ function createAssembly() {
         $('#message').text("Failed");
     } else {
         $.ajax({
-            url: './ActionServlet',
+            url: './UserServlet',
             method: 'POST',
             data: {
-                action: 'create rally',
+                action: 'createAssembly',
                 rally: rally,
                 description: description,
-                place: place,
-                date: date,
-                time: time,
+                latitude: 44.12312,
+                longitude: 102.12312,
+                colour: "white",
+                date_time: date,
                 radio: radio,
                 email: email,
                 password: password
             },
             dataType: 'json',
             error: function () {
-                alert("Error while sending new rally request");
+                console.log("Error while sending new rally request");
             }
         }).done(function (data) {
             var reponse = data.createRally;

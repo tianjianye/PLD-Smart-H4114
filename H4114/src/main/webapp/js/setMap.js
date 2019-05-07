@@ -3,11 +3,7 @@ var positions = [];
 var markers = [];
 var assemblyTable = [];
 
-
-
-setInterval()
-
-function createPositions(participants) {
+function createPositions() {
 
     positions.push({location: {latitude: latitude, longitude: longitude}});
     for (var i = 0; i< participants.length; i++)
@@ -75,7 +71,7 @@ function setPosition(position) {
 }
 
 var latitude;
-var logitude;
+var longitude;
 //var user = getQueryVariable("user");
 
 function newAssembly() {
@@ -155,39 +151,35 @@ function initMap(latitude, longitude, participants) {
         attachPseudo(markers[i], "" + i + "");
     }
     
-   var controlDiv = document.createElement('div');
-
-
-    var controlUI = document.createElement('div');
-    controlUI.style.backgroundColor = 'red';
-    controlUI.style.border = '2px solid #fff';
-    controlUI.style.cursor = 'pointer';
-    controlUI.style.marginTop = '22px';
-    controlUI.style.marginLeft = '22px';
-    controlUI.style.textAlign = 'center';
-    controlUI.title = 'Click to recenter the map';
-    controlDiv.appendChild(controlUI);
-    // Set CSS for the control interior
-    var controlText = document.createElement('div');
-    controlText.style.color = 'rgb(255,255,255)';
-    controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-    controlText.style.fontSize = '16px';
-    controlText.style.lineHeight = '38px';
-    controlText.style.paddingLeft = '5px';
-    controlText.style.paddingRight = '5px';
-    controlText.innerHTML = 'Ajouter Rassemblement';
-    controlUI.appendChild(controlText);
-    controlUI.addEventListener('click', function () {
+    var rallyDiv = document.createElement('div');
+    var createRallyDiv = document.createElement('div');
+    rallyDiv.class = "dropdown";
+    var createButton = document.createElement('button');
+    createButton.classList.add("btn");
+    createButton.classList.add("btn-primary");
+    createButton.style.width = '130px';
+    console.log(createButton);
+    createButton.innerHTML = 'Create Rally';
+    createButton.onclick = function () {
         newAssembly();
-    });
-    
-    
-    
-    controlDiv.index = 1;
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
-
-
-
+    };
+    var joinRallyDiv = document.createElement('div');
+    joinRallyDiv.id = "joinRally";
+    var joinButton = document.createElement('button');
+    joinButton.innerHTML = 'Join Rally';
+    joinButton.classList.add("btn");
+    joinButton.classList.add("btn-primary");
+    joinButton.style.width = '130px';
+    console.log(joinButton);
+    joinButton.onclick = function () {
+        $("#joinRally").load("joinRally.html");
+    };
+    createRallyDiv.appendChild(createButton);
+    createRallyDiv.appendChild(document.createElement('br'));
+    createRallyDiv.appendChild(joinButton);
+    rallyDiv.appendChild(createRallyDiv);
+    rallyDiv.appendChild(joinRallyDiv);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(rallyDiv);
 }
 
 /*var x = document.getElementById("demo");

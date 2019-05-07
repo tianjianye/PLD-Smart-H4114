@@ -11,8 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.persistence.Id;
@@ -172,8 +170,7 @@ public class Assembly {
         PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         stmt.setInt(1, idAssembly);
         ResultSet rs = stmt.executeQuery();
-        if (rs != null) {
-            rs.last();
+        if (rs.next()) {
             Assembly assembly = new Assembly(
                    idAssembly,
                     rs.getString("title"),

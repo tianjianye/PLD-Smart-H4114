@@ -92,10 +92,8 @@ public class User {
         stmt.setString(1, email); 
         stmt.setString(2, password); 
         ResultSet rs = stmt.executeQuery();
-
-        if (rs != null) 
-        {
-            rs.last();    
+        if (rs.next()) 
+        {   
             User user = new User( 
                   rs.getString("email"),
                   rs.getString("password"),
@@ -138,8 +136,7 @@ public class User {
         PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         stmt.setString(1, user.getId().toString());
         ResultSet rs = stmt.executeQuery();
-        
-        return !rs.wasNull();
+        return rs.next();
     } 
     
     public static ResultSet FindUserWithPseudo(Connection conn, String pseudo) throws SQLException{
