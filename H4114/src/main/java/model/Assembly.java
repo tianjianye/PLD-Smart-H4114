@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,14 +35,16 @@ public class Assembly {
     private Time time;
     private String description;
     private int radio;
-    private long latitiude;
-    private long longitude;
+    private double latitude;
+    private double longitude;
 
-    public Assembly(Integer id, String title, String description, String place, String date, String radio, String colour) {
+    public Assembly(Integer id, String title, String description,String date, String radio, String colour, String latitude, String longitude) {
         this.id = id;
         this.currentSurvey = null;
         this.colour = "red";
         this.radio = Integer.parseInt(radio);
+        this.latitude = Double.parseDouble(latitude);
+        this.longitude = Double.parseDouble(longitude);
 
         this.date = Util.StringToDate(date);
 
@@ -110,11 +113,11 @@ public class Assembly {
         this.radio = radio;
     }
 
-    public long getLatitiude() {
-        return latitiude;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public long getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
@@ -158,14 +161,15 @@ public class Assembly {
                     Integer.parseInt(idAssembly),
                     rs.getString("title"),
                     rs.getString("description"),
-                    rs.getString("place"),
-                    rs.getString("date"),
+                    rs.getString("date_time"),
                     rs.getString("radio"),
-                    rs.getString("colour")
+                    rs.getString("colour"),
+                    rs.getString("latitiude"),
+                    rs.getString("longitude")
             );
 
             String idSurvey = rs.getString("id_survey");
-            Survey survey = Survey.getSurvey(conn, idSurvey);
+            Survey survey = Survey.GetSurvey(conn, idSurvey);
             assembly.setCurrentSurvey(survey);
 
             return assembly;
@@ -176,14 +180,16 @@ public class Assembly {
     
     public static boolean Insert(Connection conn, Assembly assembly) throws SQLException {
         
-        String sql = "insert into assemblies(title,description,place,date,radio,colour)) values(?,?,?,?,?,?)";
-        PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        String sql = "insert into assemblies(title,description,place,date_time,radio,colour,latitude, longitude)) values(?,?,?,?,?,?,?,?)";
+        PreparedStatement preparedStatement = conn.prepareStatement(sql,  Statement.RETURN_GENERATED_KEYS); 
         preparedStatement.setString(1, assembly.getTitle());
         preparedStatement.setString(2, assembly.getDescription());
         preparedStatement.setString(3, assembly.getPlace());
         preparedStatement.setString(4, Util.DateToString(assembly.getDate()));
         preparedStatement.setString(5, Integer.toString(assembly.getRadio()));
         preparedStatement.setString(6, assembly.getColour());
+        preparedStatement.setString(7, Double.toString(assembly.getLatitude()));
+        preparedStatement.setString(8, Double.toString(assembly.getLongitude()));
 
         int flag = preparedStatement.executeUpdate();
 

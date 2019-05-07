@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.websocket.server.PathParam;
 import com.google.gson.JsonObject;
+import model.Participant;
 import org.json.simple.JSONObject;
 /**
  *
@@ -28,6 +29,9 @@ import org.json.simple.JSONObject;
 
 @ServerEndpoint(value = "/video/{room}/{usertype}/{username}")
 public class ServerEndPoint {
+    private Participant particiant;
+    
+    
     private Session session;
     private String roomNumber;
     private String name;
@@ -50,6 +54,7 @@ public class ServerEndPoint {
     public static HashMap<String, Set<ServerEndPoint> > getServerEndPoints(){
         return serverEndPoints;
     }
+    
     
     public static int getNumber(){
         return roomIndex++;
