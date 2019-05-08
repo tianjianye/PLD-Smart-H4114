@@ -111,6 +111,13 @@ function newAssembly() {
 
 }
 
+function closeCreate() {
+
+
+    document.getElementById("createAssembly").style.display = "none";
+
+}
+
 
 function createAssembly() {
     $('#message').text("");
