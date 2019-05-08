@@ -174,8 +174,14 @@ public class Participant {
         return null;
     }
 
-    public static boolean Remove(Connection conn, String id) throws SQLException {
-        return true;
+    public static boolean Remove(Connection conn, Integer idPart) throws SQLException {
+            System.out.println(idPart);
+            String sql="delete from participants where id_participant = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);           
+            stmt.setInt(1, idPart);
+            stmt.executeUpdate();
+            return true;
+            
     }
 
 }
