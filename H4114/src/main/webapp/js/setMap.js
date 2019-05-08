@@ -3,18 +3,21 @@ var positions = [];
 var markers = [];
 var assemblyTable = [];
 
-function createPositions() {
+function createPositions(participants) {
 
     positions.push({location: {latitude: latitude, longitude: longitude}});
-    for (var i = 0; i< participants.length; i++)
+    if (participants)
     {
-        var lat = participants[i].latitude;
-        var long = participants[i].longitude;
-        positions.push({location: {latitude: lat, longitude: long}});
-        
-        var assembly = participants[i].assembly;
-        var title = participants[i].title;
-        assemblyTable.push({assembly,title});
+        for (var i = 0; i< participants.length; i++)
+        {
+            var lat = participants[i].latitude;
+            var long = participants[i].longitude;
+            positions.push({location: {latitude: lat, longitude: long}});
+
+            var assembly = participants[i].assembly;
+            var title = participants[i].title;
+            assemblyTable.push({assembly,title});
+        }
     }
     
     /*positions.push({location: {latitude: 45.782019, longitude: 4.872554}});
@@ -136,7 +139,10 @@ function initMap(latitude, longitude, participants) {
             position: google.maps.ControlPosition.LEFT_BOTTOM
         }});
     
-    createPositions(participants);
+    if (participants)
+    {
+        createPositions(participants);
+    }
     //Markers
     var marker0 = new google.maps.Marker({
         position: location,
