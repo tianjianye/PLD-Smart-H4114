@@ -1,5 +1,5 @@
-<div>Sondage en Cours
-    <div id="vote" class="container" style="font-size: 25px;font-family:Arial">
+<div style="text-align: center"><strong>Sondage en Cours</strong>
+    <div id="vote" class="container d-flex justify-content-center" style="font-size: 25px;font-family:Arial; color:skyblue">
     </div>
     <div id="errorMsg"></div>
 </div>
@@ -22,17 +22,24 @@
             var response = data;
             console.log(response);
             var state = response.state;
-            if(state == 1) {
+            $("#vote").html("");
+            if(state === "-1"){
+                $("#vote").html("<p>Veuillez joindre un rassemblement pour visualiser des votes qui vous intéressent!</p>");
+            }else if(state === "1") {
                 //No survey and impossible to create one
                 $("#vote").html("<p>Aucun sondage pour le moment, veuillez revenir plus tard!</p>");
-            } else if (state == 2) {
+            } else if (state === "2") {
                 //Moderator
-                $("#vote").html("<p>Aucun sondage pour le moment, mais vous pouvez en creer un!</p>");
+                //$("#vote").html("<p>Aucun sondage pour le moment, mais vous pouvez en créer un!</p>");
+                var text = document.createElement("p");
+                text.innerHTML = "Aucun sondage pour le moment, mais vous pouvez en créer un!";
+                document.getElementById("vote").appendChild(text);
+                document.getElementById("vote").appendChild(document.createElement('br'));
                 var createQuestionDiv = document.createElement("div");
                 createQuestionDiv.id = "createQuestion";
                 document.getElementById("vote").appendChild(createQuestionDiv);
                 $('#createQuestion').load("question-form.html");
-            } else if (state == 3) {
+            } else if (state === "3") {
                 var question = response.question;
                 var choices = response.choices;
                 var choicesTab = choices.split(";");
