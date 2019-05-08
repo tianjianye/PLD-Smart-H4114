@@ -70,13 +70,13 @@ public class UserServlet extends HttpServlet {
                     try (PrintWriter out = response.getWriter()) {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         if(user != null){
-                            /*
+                            
                             participant = Participant.GetParticipantUser(conn,user.getId());
                             if (participant != null)
                             {
                                 request.getSession().setAttribute("participant", participant);
                             }
-                            */
+                            
                             connect.addProperty("connect", "successful");
                             request.getSession().setAttribute("user", user);
                         }
@@ -218,7 +218,42 @@ public class UserServlet extends HttpServlet {
                
                 break;
             }
+            case "getAssemblySession":
+            {
+                try
+                {
+                    PrintWriter out = response.getWriter();
+                    Gson gson=new GsonBuilder().setPrettyPrinting().create();
+                    conn = DBConnection.Connection();
+                    participant = (Participant) request.getSession().getAttribute("participant");
+                    JsonObject reponse = new JsonObject();
+                    JsonObject assembly = new JsonObject();
+                    
+                    if (participant != null)
+                    {
+                        reponse.addProperty("exist", true);
+                        assembly.addProperty("id", participant.getAssembly().getId());
+                        assembly.addProperty("title", participant.getAssembly().getTitle());
+                        assembly.addProperty("colour", participant.getAssembly().getColour());
+                    }
+                    else
+                    {
+                        reponse.addProperty("exist", false);
+                    }
+                   
+                  
+                   
+                    reponse.add("Assembly", assembly);
+                    out.println(gson.toJson(reponse));
+                    
+                } catch (ClassNotFoundException | SQLException | InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+               
+                break;
+            }
              
+            
              
             case "joinAssembly":
             {
@@ -227,6 +262,11 @@ public class UserServlet extends HttpServlet {
                     conn = DBConnection.Connection();
                     
                     user = (User) request.getSession().getAttribute("user");
+                    if(user == null)
+                    {
+                        System.err.println("kkk");
+                        break;
+                    }
                     participant = (Participant) request.getSession().getAttribute("participant");
                     String idAssembly = request.getParameter("id_assembly");   
                     Assembly assembly;
@@ -263,9 +303,19 @@ public class UserServlet extends HttpServlet {
                     JsonObject participate=new JsonObject();
                     participate.addProperty("participate", "true");
                     joinAssembly.add("participate", participate);
-                    out.println(gson.toJson(joinAssembly));
+                    
                     System.out.println(participant.toJson());
                     request.getSession().setAttribute("participant", participant);
+                    
+                    JsonObject assemblyJ = new JsonObject();
+                    
+  
+                    assemblyJ.addProperty("id", participant.getAssembly().getId());
+                    assemblyJ.addProperty("title", participant.getAssembly().getTitle());
+                    assemblyJ.addProperty("colour", participant.getAssembly().getColour());
+
+                    joinAssembly.add("Assembly", assemblyJ);
+                    out.println(gson.toJson(joinAssembly));
                     
                     
                 }

@@ -2,6 +2,8 @@ var map;
 var positions = [];
 var markers = [];
 var assemblyTable = [];
+var assemblyInterested = null;
+var theAssembly = null;
 
 function createPositions(participants) {
 
@@ -66,11 +68,36 @@ function setPosition(position) {
                 alert("Error while sending new request");
             }
         }).done(function (data) {
+            var participants = data.Participants;
+            getAssemblyUser();
+            initMap(latitude, longitude, participants);
             
-            initMap(latitude, longitude, data.Participants);
+            
+           
              
         });
+        
+        
     
+}
+
+function getAssemblyUser()
+{
+    $.ajax({
+            url: './UserServlet',
+            method: 'POST',
+            data: {
+                action: 'getAssemblySession',
+            },
+            dataType: 'json',
+            error: function () {
+                alert("Error while sending new request");
+            }
+        }).done(function (data) {
+            console.log(data);
+            theAssembly = data.Assembly;
+             
+        });
 }
 
 var latitude;
@@ -120,7 +147,97 @@ function createAssembly() {
         });
     }
 }
+function quitAssembly()
+{
+    $.ajax({
+        url: './ParticipantServlet',
+        method: 'POST',
+        data: {
+            action : 'removeParticipate',
+        },
+        dataType: 'json'
+    }).done(function (data) {
+         theAssembly = null;
+         initButtons();
+    });
+    
+}
 
+
+function initButtons()
+{
+    $("#rallyDiv").remove();
+    if (!theAssembly)
+    {
+        var rallyDiv = document.createElement('div');
+        var createRallyDiv = document.createElement('div');
+        rallyDiv.class = "dropdown";
+        rallyDiv.id="rallyDiv";
+        var createButton = document.createElement('button');
+        createButton.classList.add("btn");
+        createButton.classList.add("btn-primary");
+        createButton.style.width = '130px';
+        console.log(createButton);
+        createButton.innerHTML = 'Créer un Rassemblement';
+        createButton.onclick = function () {
+            newAssembly();
+        };
+        var joinRallyDiv = document.createElement('div');
+        joinRallyDiv.id = "joinRally";
+        var joinButton = document.createElement('button');
+        joinButton.innerHTML = 'Joindre un Rassemblement';
+        joinButton.classList.add("btn");
+        joinButton.classList.add("btn-primary");
+        joinButton.style.width = '130px';
+        console.log(joinButton);
+        joinButton.onclick = function () {
+            //joinRallyDiv.setAttribute("");
+            $("#joinRally").load("joinRally.html");
+        };
+        createRallyDiv.appendChild(createButton);
+        createRallyDiv.appendChild(document.createElement('br'));
+        createRallyDiv.appendChild(document.createElement('br'));
+        createRallyDiv.appendChild(joinButton);
+        rallyDiv.appendChild(createRallyDiv);
+        rallyDiv.appendChild(joinRallyDiv);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(rallyDiv);
+    }
+    else
+    {
+        var rallyDiv = document.createElement('div');
+        var createRallyDiv = document.createElement('div');
+        rallyDiv.id="rallyDiv";
+        rallyDiv.class = "dropdown";
+        var createButton = document.createElement('button');
+        createButton.classList.add("btn");
+        createButton.classList.add("btn-primary");
+        createButton.style.width = '130px';
+        console.log(createButton);
+        createButton.innerHTML = 'Quitter le Rassemblement';
+        createButton.onclick = function () {
+            quitAssembly();
+        };
+        var joinRallyDiv = document.createElement('div');
+        joinRallyDiv.id = "joinRally";
+        var joinButton = document.createElement('button');
+        joinButton.innerHTML = theAssembly.title;
+        joinButton.classList.add("btn");
+        joinButton.style.backgroundColor = theAssembly.colour;
+        joinButton.classList.add("btn-primary");
+        joinButton.style.width = '130px';
+        
+        createRallyDiv.appendChild(joinButton);
+        createRallyDiv.appendChild(document.createElement('br'));
+        createRallyDiv.appendChild(document.createElement('br'));
+        createRallyDiv.appendChild(createButton);
+        rallyDiv.appendChild(createRallyDiv);
+        rallyDiv.appendChild(joinRallyDiv);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(rallyDiv);
+ 
+        
+        
+    }
+}
 function initMap(latitude, longitude, participants) {
     var location = {lat: latitude, lng: longitude};
     
@@ -157,35 +274,7 @@ function initMap(latitude, longitude, participants) {
         attachPseudo(markers[i], "" + i + "");
     }
     
-    var rallyDiv = document.createElement('div');
-    var createRallyDiv = document.createElement('div');
-    rallyDiv.class = "dropdown";
-    var createButton = document.createElement('button');
-    createButton.classList.add("btn");
-    createButton.classList.add("btn-primary");
-    createButton.style.width = '130px';
-    console.log(createButton);
-    createButton.innerHTML = 'Create Rally';
-    createButton.onclick = function () {
-        newAssembly();
-    };
-    var joinRallyDiv = document.createElement('div');
-    joinRallyDiv.id = "joinRally";
-    var joinButton = document.createElement('button');
-    joinButton.innerHTML = 'Join Rally';
-    joinButton.classList.add("btn");
-    joinButton.classList.add("btn-primary");
-    joinButton.style.width = '130px';
-    console.log(joinButton);
-    joinButton.onclick = function () {
-        $("#joinRally").load("joinRally.html");
-    };
-    createRallyDiv.appendChild(createButton);
-    createRallyDiv.appendChild(document.createElement('br'));
-    createRallyDiv.appendChild(joinButton);
-    rallyDiv.appendChild(createRallyDiv);
-    rallyDiv.appendChild(joinRallyDiv);
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(rallyDiv);
+    initButtons();
 }
 
 /*var x = document.getElementById("demo");
@@ -233,15 +322,15 @@ function dbscan() {
 
     var nbicon = 4;
     var clusterUser = cluster[0];
-    const assembly = new Set();
+    assemblyInterested = new Map();
     
     for (var i = 1; i < assemblyTable.length; i++)
     {
         if(cluster[i] == clusterUser)
         {
-            if(!assembly.has(assemblyTable[i]))
+            if(!assemblyInterested.has(assemblyTable[i].assembly))
             {
-                assembly.add(assemblyTable[i]);
+                assemblyInterested.set(assemblyTable[i].assembly, assemblyTable[i]);
             }
         }
         

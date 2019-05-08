@@ -129,7 +129,31 @@ public class ParticipantServlet extends HttpServlet {
                 survey.start();
 
                 break;
-            }   
+            }  
+            case "removeParticipate":
+            {
+                Participant participant = (Participant) request.getSession().getAttribute("participant");
+                if (participant == null) {
+                    break;
+                }
+                
+                
+                
+                try {
+                    conn = DBConnection.Connection();
+                    Participant.Remove(conn, participant.getId());
+                } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+                    Logger.getLogger(ParticipantServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                 request.getSession().removeAttribute("participant");
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonObject surveyInfo = new JsonObject();
+                surveyInfo.addProperty("removeParticipate", "true");
+                out.println(gson.toJson(surveyInfo)); 
+               
+
+                break;
+            }  
             case "getResultSurvey":
             {
                 Participant participant = (Participant) request.getSession().getAttribute("participant");
