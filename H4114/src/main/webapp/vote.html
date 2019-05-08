@@ -6,9 +6,120 @@
 
 
 <script>
+    var Survey = null;
+    
     function clearVote(){
         $("#tableBody").html("");
     }
+    function displaySurvey()
+    {
+        var voteDiv = document.getElementById("vote");
+        voteDiv.innerHTML = "";
+        var questionDiv = document.createElement("div");
+        questionDiv.innerHTML = Survey.question;
+        questionDiv.id = "question";
+        voteDiv.appendChild(questionDiv);
+        var choicesTab = Survey.choices.split(";");
+        var choicesDiv = document.createElement("div");
+        choicesDiv.id = "choices";
+        for(i = 0; i<choicesTab.length; i++){
+            var choiceRadio = document.createElement("input");
+            choiceRadio.setAttribute("type", "radio");
+            choiceRadio.setAttribute("name", "voteChoices");
+            choiceRadio.setAttribute("value", choicesTab[i]);    
+            var choiceLabel = document.createElement("label");                
+            choiceLabel.innerHTML = choicesTab[i];
+            choicesDiv.appendChild(choiceRadio);
+            choicesDiv.appendChild(choiceLabel);
+            choicesDiv.appendChild(document.createElement("br"));
+        }
+        voteDiv.appendChild(choicesDiv);
+ 
+        var sendButton = document.createElement("button");
+        sendButton.id = "sendResponse";
+        sendButton.innerHTML = "Vote";
+        sendButton.classList.add("btn");
+        sendButton.classList.add("btn-primary");
+        sendButton.onclick = function(){
+            var radioValue = $("input[name='voteChoices']:checked").val();
+            console.log(radioValue);
+            if(radioValue){
+                $.ajax({
+                    url: './ParticipantServlet',
+                    method: 'POST',
+                    data: {
+                        action : 'voteSurvey',
+                        response : radioValue
+                    },
+                    dataType: 'json'
+                });
+            } else {
+                $("#errorMsg").innerHTML("Please select a value!");
+            }
+        };
+        voteDiv.appendChild(sendButton);
+        
+    }
+    
+    function updateSurvey()
+    {
+        
+        var voteDiv = document.getElementById("vote");
+        voteDiv.innerHTML = "";
+
+        $.ajax({
+            url: './ParticipantServlet',
+            method: 'POST',
+            data: {
+                action : 'getResultSurvey',
+            },
+            dataType: 'json'
+         }).done(function (data) 
+         {
+             Survey = data.Survey;
+             displayResultSurvey()
+
+         });  
+      
+    }
+    
+    function displayResultSurvey()
+    {
+        var state = Survey.state;
+        
+        var voteDiv = document.getElementById("vote");
+        voteDiv.innerHTML = "";
+        
+        var resultDiv = document.createElement("div");
+        var content = "";
+        content += "<h2>Question: </h2>&nbsp;&nbsp;" + Survey.question + "<br/><br/>";
+        
+        if(state == 1)
+        {
+            content += "<h2>Choix de Réponses possibles:</h2>";
+            var table = Survey.choices.split(";");
+            for (var i = 0; i < table.length; i++)
+            {
+                 content += "&nbsp;&nbsp;"+table[i]+"<br/>";
+            }
+        }
+        else if(state == 2)
+        {
+           content += "<h2>Les Résultats sont:</h2>";
+            var responses = Survey.responses;
+            for (var i = 0; i < responses.length; i++)
+            {
+                 content += "&nbsp;&nbsp;→ "+responses[i].response+" : ";
+                 content += responses[i].value + " votes<br/>";
+            }
+        }
+        resultDiv.innerHTML=content;
+        voteDiv.appendChild(resultDiv);
+        
+        
+      
+    }
+    
     $(document).ready(function () {
         $.ajax({
             url: './ParticipantServlet',
@@ -22,7 +133,11 @@
             var response = data;
             console.log(response);
             var state = response.state;
-            if(state == 1) {
+            if(state == -1) {
+                //No survey and impossible to create one
+                $("#vote").html("<p>Vous ne faites pas partie d'un rassemblement !</p>");
+            } 
+            else if(state == 1) {
                 //No survey and impossible to create one
                 $("#vote").html("<p>Aucun sondage pour le moment, veuillez revenir plus tard!</p>");
             } else if (state == 2) {
@@ -33,52 +148,22 @@
                 document.getElementById("vote").appendChild(createQuestionDiv);
                 $('#createQuestion').load("question-form.html");
             } else if (state == 3) {
+                var id_survey = response.id_survey;
                 var question = response.question;
+                var duration = response.timeMillis;
                 var choices = response.choices;
                 var choicesTab = choices.split(";");
                 var publicKey = response.publicKey;
-                var voteDiv = document.getElementById("vote");
-                var questionDiv = document.createElement("div");
-                questionDiv.innerHTML = question;
-                questionDiv.id = "question";
-                voteDiv.appendChild(questionDiv);
-                var choicesDiv = document.createElement("div");
-                choicesDiv.id = "choices";
-                for(i = 0; i<choicesTab.length; i++){
-                    var choiceRadio = document.createElement("input");
-                    choiceRadio.setAttribute("type", "radio");
-                    choiceRadio.setAttribute("name", "voteChoices");
-                    choiceRadio.setAttribute("value", choicesTab[i]);    
-                    var choiceLabel = document.createElement("label");                
-                    choiceLabel.innerHTML = choicesTab[i];
-                    choicesDiv.appendChild(choiceRadio);
-                    choicesDiv.appendChild(choiceLabel);
-                    choicesDiv.appendChild(document.createElement("br"));
+                Survey = {
+                    id_survey,
+                    question,
+                    choices,
+                    publicKey
                 }
-                voteDiv.appendChild(choicesDiv);
-                var sendButton = document.createElement("button");
-                sendButton.id = "sendResponse";
-                sendButton.innerHTML = "Vote";
-                sendButton.classList.add("btn");
-                sendButton.classList.add("btn-primary");
-                sendButton.onclick = function(){
-                    var radioValue = $("input[name='voteChoices']:checked").val();
-                    console.log(radioValue);
-                    if(radioValue){
-                        $.ajax({
-                            url: './ParticipantServlet',
-                            method: 'POST',
-                            data: {
-                                action : 'voteSurvey',
-                                response : radioValue
-                            },
-                            dataType: 'json'
-                        });
-                    } else {
-                        $("#errorMsg").innerHTML("Please select a value!");
-                    }
-                };
-                voteDiv.appendChild(sendButton);
+                
+                displaySurvey();
+                
+                
             }
         });
     });

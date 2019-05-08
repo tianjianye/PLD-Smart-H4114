@@ -7,42 +7,23 @@ var theAssembly = null;
 
 function createPositions(participants) {
 
+
     positions.push({location: {latitude: latitude, longitude: longitude}});
     if (participants)
     {
         for (var i = 0; i< participants.length; i++)
         {
+            
             var lat = participants[i].latitude;
             var long = participants[i].longitude;
             positions.push({location: {latitude: lat, longitude: long}});
 
-            var assembly = participants[i].assembly;
+            var id_assembly = participants[i].id_assembly;
             var title = participants[i].title;
-            assemblyTable.push({assembly,title});
+            assemblyTable.push({id_assembly,title});
         }
     }
-    
-    /*positions.push({location: {latitude: 45.782019, longitude: 4.872554}});
-    positions.push({location: {latitude: 45.781980, longitude: 4.872514}});
-    positions.push({location: {latitude: 45.782039, longitude: 4.872470}});
-    positions.push({location: {latitude: 45.782048, longitude: 4.872501}});
-    positions.push({location: {latitude: 45.781048, longitude: 4.872501}});
-    positions.push({location: {latitude: 45.781108, longitude: 4.872500}});
-    positions.push({location: {latitude: 45.781008, longitude: 4.872504}});
-    positions.push({location: {latitude: 45.782039, longitude: 4.862470}});
-    
-    
-    assemblyTable.push(5);
-    assemblyTable.push(5);
-    assemblyTable.push(1);
-    assemblyTable.push(5);
-    assemblyTable.push(0);
-    assemblyTable.push(4);
-    assemblyTable.push(5);
-    assemblyTable.push(5);
-    assemblyTable.push(2);
-    assemblyTable.push(5);
-    */
+
 }
 
 function getLocation() {
@@ -106,7 +87,7 @@ var longitude;
 
 function newAssembly() {
 
-
+    
     document.getElementById("createAssembly").style.display = "block";
 
 }
@@ -138,12 +119,17 @@ function createAssembly() {
                 console.log("Error while sending  assembly request");
             }
         }).done(function (data) {
-            var reponse = data.createAssembly;
-            if (reponse.created === "true") {
+            
+            if(data.created == true)
+            {
+                theAssembly = data.Assembly;
+                assemblyInterested.set(theAssembly.id_assembly,theAssembly);
                 document.getElementById("createAssembly").style.display = "none";
             } else {
-                $('#message').text("Ups we didn't succed to verify rally creation");
+                $('#message').text("Ups we didn't succed to verify assembly creation");
             }
+            
+            initButtons();
         });
     }
 }
@@ -241,7 +227,7 @@ function initButtons()
 function initMap(latitude, longitude, participants) {
     var location = {lat: latitude, lng: longitude};
     
-   
+   console.log(participants);
     
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 19,
@@ -328,9 +314,9 @@ function dbscan() {
     {
         if(cluster[i] == clusterUser)
         {
-            if(!assemblyInterested.has(assemblyTable[i].assembly))
+            if(!assemblyInterested.has(assemblyTable[i].id_assembly))
             {
-                assemblyInterested.set(assemblyTable[i].assembly, assemblyTable[i]);
+                assemblyInterested.set(assemblyTable[i].id_assembly, assemblyTable[i]);
             }
         }
         

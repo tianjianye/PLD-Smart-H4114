@@ -71,7 +71,7 @@ public class UserServlet extends HttpServlet {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         if(user != null){
                             
-                            participant = Participant.GetParticipantUser(conn,user.getId());
+                            participant = Participant.GetParticipantUser(conn,user);
                             if (participant != null)
                             {
                                 request.getSession().setAttribute("participant", participant);
@@ -232,7 +232,7 @@ public class UserServlet extends HttpServlet {
                     if (participant != null)
                     {
                         reponse.addProperty("exist", true);
-                        assembly.addProperty("id", participant.getAssembly().getId());
+                        assembly.addProperty("id_assembly", participant.getAssembly().getId());
                         assembly.addProperty("title", participant.getAssembly().getTitle());
                         assembly.addProperty("colour", participant.getAssembly().getColour());
                     }
@@ -410,7 +410,7 @@ public class UserServlet extends HttpServlet {
                 
                     if (user == null)
                     {
-                        System.out.println("asdwqwqqasdasdwqwqwqwqwqw");
+                       
                         break;
                     }
                                    
@@ -425,33 +425,32 @@ public class UserServlet extends HttpServlet {
                             request.getSession().setAttribute("assembly", assembly);
                     }
                     else{
-                        System.out.println("wqwqqwqwqwqwqwqw");
+                        
                         break;
                     }
-               
-                PrintWriter out = response.getWriter() ;
-                if(Participant.Insert(conn, participant)){
-                    request.getSession().setAttribute("participant", participant);
-                    
+                     
+                   
                     Gson gson=new GsonBuilder().setPrettyPrinting().create();
-                    JsonObject participate=new JsonObject();
-                    JsonObject createAssembly =new JsonObject();
-                    participate.addProperty("created", "true");
-                    createAssembly.add("createAssembly", participate);
-                    out.println(gson.toJson(createAssembly));
-                    
+                    PrintWriter out = response.getWriter() ;
+                    JsonObject reponse = new JsonObject();
+                    if(Participant.Insert(conn, participant))
+                    {
+                       
+                        JsonObject assemblyJ = new JsonObject();
+                        reponse.addProperty("created", true);
+                        assemblyJ.addProperty("id_assembly", participant.getAssembly().getId());
+                        assemblyJ.addProperty("title", participant.getAssembly().getTitle());
+                        assemblyJ.addProperty("colour", participant.getAssembly().getColour());
+                        reponse.add("Assembly", assemblyJ);
+                        
+                        request.getSession().setAttribute("participant", participant);
+                    }
+                    else
+                    {
+                        reponse.addProperty("created", false);
+                    }
 
-                }
-                else{
-                    Gson gson=new GsonBuilder().setPrettyPrinting().create();
-                    JsonObject participate=new JsonObject();
-                    JsonObject createAssembly =new JsonObject();
-                    participate.addProperty("created", "false");
-                    createAssembly.add("createAssembly", participate);
-                    out.println(gson.toJson(createAssembly));
-                    
-                    
-                }
+                    out.println(gson.toJson(reponse));
                 out.close();
             } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);

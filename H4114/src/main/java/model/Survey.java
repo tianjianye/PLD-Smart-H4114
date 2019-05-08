@@ -8,6 +8,8 @@
 
 package model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.io.PrintStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -21,7 +23,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.persistence.GeneratedValue;
@@ -63,6 +67,14 @@ public class Survey {
     public static Survey getSurvey(Integer idAssembly)
     {
         return surveys.get(idAssembly);
+    }
+
+    public int getStat() {
+        return stat;
+    }
+
+    public void setStat(int stat) {
+        this.stat = stat;
     }
     
 
@@ -132,6 +144,32 @@ public class Survey {
         
         
 
+    }
+    
+    public JsonObject toJson(){
+        JsonObject json = new JsonObject();
+        json.addProperty("id_survey", this.id);
+        json.addProperty("question", this.question);
+        json.addProperty("choices", this.getChoices());
+        json.addProperty("state", this.stat);
+        JsonArray responsesV = new JsonArray();
+        if (this.stat == 2)
+        {
+            Set keys = this.responses.keySet();
+            Iterator it = keys.iterator();
+            while (it.hasNext()){
+               Object key = it.next(); 
+               Object value = this.responses.get(key);
+
+                JsonObject reponseV = new JsonObject();
+                reponseV.addProperty("response", (String) key);
+                reponseV.addProperty("value", (int) value);   
+                responsesV.add(reponseV);
+            }
+        }
+        json.add("responses", responsesV);
+       
+        return json;
     }
     
     public int getTimeMillis()

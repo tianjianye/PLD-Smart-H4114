@@ -14,7 +14,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -154,13 +157,17 @@ public class ParticipantServlet extends HttpServlet {
             }  
             case "getResultSurvey":
             {
+                JsonObject responseR = new JsonObject();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                
                 Participant participant = (Participant) request.getSession().getAttribute("participant");
                 if (participant == null ) {
                     break;
                 }
                 survey = Survey.getSurvey(participant.getAssembly().getId());
-                survey.getResponses();
+                responseR.add("Survey", survey.toJson());
                 
+                out.println(gson.toJson(responseR));
                
                 break;
             }
@@ -204,7 +211,9 @@ public class ParticipantServlet extends HttpServlet {
                         surveyInfo.add("survey", cSurvey);
                         out.println(gson.toJson(surveyInfo));
 
-                        request.getSession().setAttribute("survey", survey);
+                        request.getSession().setAttribute("survey", survey); 
+                        survey.start();
+                        
                     } else {
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         JsonObject cSurvey = new JsonObject();
@@ -265,7 +274,8 @@ public class ParticipantServlet extends HttpServlet {
                 surveyInfo.addProperty("state", "3");
                 surveyInfo.addProperty("question", survey.getQuestion());
                 surveyInfo.addProperty("choices", survey.getChoices());
-              //  surveyInfo.addProperty("publicKey", survey.getPublicKey());
+                surveyInfo.addProperty("timeMillis", survey.getTimeMillis());
+                surveyInfo.addProperty("publicKey", Base64.getEncoder().encodeToString(survey.getPublicKey()));
                 out.println(gson.toJson(surveyInfo));
 
                 break;
