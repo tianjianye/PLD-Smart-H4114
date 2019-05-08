@@ -165,7 +165,7 @@ public class ParticipantServlet extends HttpServlet {
                     break;
                 }
                 survey = Survey.getSurvey(participant.getAssembly().getId());
-                responseR.add("Survey", survey.toJson());
+                responseR.add("Survey", survey.toJson(false));
                 
                 out.println(gson.toJson(responseR));
                
@@ -272,10 +272,7 @@ public class ParticipantServlet extends HttpServlet {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 JsonObject surveyInfo = new JsonObject();
                 surveyInfo.addProperty("state", "3");
-                surveyInfo.addProperty("question", survey.getQuestion());
-                surveyInfo.addProperty("choices", survey.getChoices());
-                surveyInfo.addProperty("timeMillis", survey.getTimeMillis());
-                surveyInfo.addProperty("publicKey", Base64.getEncoder().encodeToString(survey.getPublicKey()));
+                surveyInfo.add("Survey", survey.toJson(true));
                 out.println(gson.toJson(surveyInfo));
 
                 break;

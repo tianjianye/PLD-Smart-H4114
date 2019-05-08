@@ -148,22 +148,18 @@
                 document.getElementById("vote").appendChild(createQuestionDiv);
                 $('#createQuestion').load("question-form.html");
             } else if (state == 3) {
-                var id_survey = response.id_survey;
-                var question = response.question;
-                var duration = response.timeMillis;
-                var choices = response.choices;
-                var choicesTab = choices.split(";");
-                var publicKey = response.publicKey;
-                Survey = {
-                    id_survey,
-                    question,
-                    choices,
-                    publicKey
+                Survey = data.Survey;
+                
+                
+                if (Survey.state==1)
+                {
+                    displaySurvey();
                 }
-                
-                displaySurvey();
-                
-                
+                else if (Survey.state==2)
+                {
+                    updateSurvey();
+                }
+
             }
         });
     });

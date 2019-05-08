@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -146,7 +147,7 @@ public class Survey {
 
     }
     
-    public JsonObject toJson(){
+    public JsonObject toJson(boolean withPk){
         JsonObject json = new JsonObject();
         json.addProperty("id_survey", this.id);
         json.addProperty("question", this.question);
@@ -168,6 +169,11 @@ public class Survey {
             }
         }
         json.add("responses", responsesV);
+        
+        if(withPk)
+        {
+            json.addProperty("publicKey",  Base64.getEncoder().encodeToString(this.getPublicKey()));
+        }
        
         return json;
     }
