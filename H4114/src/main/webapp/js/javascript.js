@@ -50,7 +50,7 @@ function getAssemblies()
             },
             dataType: 'json',
             error: function () {
-                console.log("GetAssemblies : Error while sending new request");
+                console.log("GetAssemblies : Error while getting assemblies");
             }
         }).done(function (data) {
            
@@ -68,7 +68,7 @@ function getPseudos()
             },
             dataType: 'json',
             error: function () {
-                console.log("getPseudos : Error while sending new request");
+                console.log("getPseudos : Error while getting pseudo");
             }
         }).done(function (data) {
             console.log(data);
@@ -86,7 +86,7 @@ function getParticipants()
             },
             dataType: 'json',
             error: function () {
-                console.log("GetParticipants : Error while sending new request");
+                console.log("GetParticipants : Error while getting participants");
             }
         }).done(function (data) {
             console.log(data);

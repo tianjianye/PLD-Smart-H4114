@@ -169,7 +169,8 @@
                 console.log('Camera started');
             });
             $('#stop').on('click', function () {
-                if(identity === 'None'){
+                console.log(identity);
+                if(identity === 'none'){
                     stop();
                 }else if(identity === 'caller'){
                     stopCaller();

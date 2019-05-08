@@ -83,7 +83,7 @@ public class Participant {
         json.addProperty("id", this.id);
         json.addProperty("status", this.status);
         json.addProperty("pseudo", this.user.getPseudo());
-        json.addProperty("assembly", this.assembly.getId());
+        json.addProperty("id_assembly", this.assembly.getId());
         json.addProperty("title", this.assembly.getTitle());
         json.addProperty("latitude", this.latitude);
         json.addProperty("longitude", this.longitude);
@@ -147,11 +147,11 @@ public class Participant {
         return participants;
     }
     
-    public static Participant GetParticipantUser(Connection conn, Integer idUser) throws SQLException {
+    public static Participant GetParticipantUser(Connection conn, User user) throws SQLException {
        
         String sql="select * from participants where id_user = ?";
         PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);   
-        stmt.setInt(1, idUser);      
+        stmt.setInt(1, user.getId());      
         ResultSet rs = stmt.executeQuery();
 
         if(rs.next())
@@ -159,7 +159,6 @@ public class Participant {
             
             Integer idP = rs.getInt("id_participant");
             Integer idU =  rs.getInt("id_user");
-            User user = User.getUser(conn, idU);
             Integer idA = rs.getInt("id_assembly");
             Assembly assembly = Assembly.getAssembly(conn, idU);
             int status =  rs.getInt("status");

@@ -31,16 +31,15 @@
         <script>
             function fun(){
                 goodbye();
-                return undefined;//这里一定要是underfined，不能是字符串
+                return undefined;
             }
  
             function goodbye(){
-            //进入后台一定要用ajax，window.location.href不管用！！
                 $.ajax({
-                url:"http://localhost:8084/H4114/UserServlet?action=clearData",
-                type:"POST",
-                success:function(data){
-
+                    url:"http://localhost:8084/H4114/UserServlet?action=clearData",
+                    type:"POST",
+                    success:function(data){
+                        console.log("Déconnexion du client");
                     }
                 }); 
             }
