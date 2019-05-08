@@ -1,12 +1,15 @@
 <div>Sondage en Cours
     <div id="vote" class="container" style="font-size: 25px;font-family:Arial">
     </div>
+    <div id="addVote"></div>
     <div id="errorMsg"></div>
 </div>
 
 
 <script>
     var Survey = null;
+    var voted = false;
+    
     
     function clearVote(){
         $("#tableBody").html("");
@@ -34,30 +37,34 @@
             choicesDiv.appendChild(document.createElement("br"));
         }
         voteDiv.appendChild(choicesDiv);
- 
-        var sendButton = document.createElement("button");
-        sendButton.id = "sendResponse";
-        sendButton.innerHTML = "Vote";
-        sendButton.classList.add("btn");
-        sendButton.classList.add("btn-primary");
-        sendButton.onclick = function(){
-            var radioValue = $("input[name='voteChoices']:checked").val();
-            console.log(radioValue);
-            if(radioValue){
-                $.ajax({
-                    url: './ParticipantServlet',
-                    method: 'POST',
-                    data: {
-                        action : 'voteSurvey',
-                        response : radioValue
-                    },
-                    dataType: 'json'
-                });
-            } else {
-                $("#errorMsg").innerHTML("Please select a value!");
-            }
-        };
-        voteDiv.appendChild(sendButton);
+        if (!voted)
+        {
+
+            var sendButton = document.createElement("button");
+            sendButton.id = "sendResponse";
+            sendButton.innerHTML = "Vote";
+            sendButton.classList.add("btn");
+            sendButton.classList.add("btn-primary");
+            sendButton.onclick = function(){
+                voted = true;
+                var radioValue = $("input[name='voteChoices']:checked").val();
+                console.log(radioValue);
+                if(radioValue){
+                    $.ajax({
+                        url: './ParticipantServlet',
+                        method: 'POST',
+                        data: {
+                            action : 'voteSurvey',
+                            response : radioValue
+                        },
+                        dataType: 'json'
+                    });
+                } else {
+                    $("#errorMsg").innerHTML("Please select a value!");
+                }
+            };
+            voteDiv.appendChild(sendButton);
+        }
         
     }
     
@@ -77,13 +84,14 @@
          }).done(function (data) 
          {
              Survey = data.Survey;
-             displayResultSurvey()
+             var canCreate = data.canCreate;
+             displayResultSurvey(canCreate);
 
          });  
       
     }
     
-    function displayResultSurvey()
+    function displayResultSurvey(canCreate)
     {
         var state = Survey.state;
         
@@ -116,6 +124,15 @@
         resultDiv.innerHTML=content;
         voteDiv.appendChild(resultDiv);
         
+        if (canCreate)
+        {
+             $("#addVote").html("<p>Le sondage a été terminé, vous pouvez en refaire un!</p>");
+            var createQuestionDiv = document.createElement("div");
+            createQuestionDiv.id = "createQuestion";
+            document.getElementById("vote").appendChild(createQuestionDiv);
+            $('#createQuestion').load("question-form.html");
+        }
+        
         
       
     }
@@ -142,7 +159,8 @@
                 $("#vote").html("<p>Aucun sondage pour le moment, veuillez revenir plus tard!</p>");
             } else if (state == 2) {
                 //Moderator
-                $("#vote").html("<p>Aucun sondage pour le moment, mais vous pouvez en creer un!</p>");
+                $("#vote").html("");
+                $("#addVote").html("<p>Aucun sondage pour le moment, mais vous pouvez en creer un!</p>");
                 var createQuestionDiv = document.createElement("div");
                 createQuestionDiv.id = "createQuestion";
                 document.getElementById("vote").appendChild(createQuestionDiv);
@@ -153,13 +171,16 @@
                 
                 if (Survey.state==1)
                 {
+                    $("#addVote").html("");
                     displaySurvey();
+                    
+                    
                 }
                 else if (Survey.state==2)
                 {
                     updateSurvey();
+                    voted = false;
                 }
-
             }
         });
     });

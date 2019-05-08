@@ -174,6 +174,8 @@ public class ParticipantServlet extends HttpServlet {
                 }
                 survey = Survey.getSurvey(participant.getAssembly().getId());
                 responseR.add("Survey", survey.toJson(false));
+                responseR.addProperty("canCreate", participant.getStatus()>=2 &&
+                        survey.getStat() == 2);
                 
                 out.println(gson.toJson(responseR));
                
@@ -271,6 +273,8 @@ public class ParticipantServlet extends HttpServlet {
                     out.println(gson.toJson(surveyInfo)); 
                     break;
                 }
+                
+                
                 /*  System.out.println("Public Key:");
                 System.out.println(convertToPublicKey(encodedPublicKey));
                 String token = generateJwtToken(privateKey);
