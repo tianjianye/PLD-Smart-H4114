@@ -7,42 +7,26 @@ var theAssembly = null;
 
 function createPositions(participants) {
 
+    positions= [];
     positions.push({location: {latitude: latitude, longitude: longitude}});
     if (participants)
     {
         for (var i = 0; i< participants.length; i++)
         {
+            
             var lat = participants[i].latitude;
             var long = participants[i].longitude;
             positions.push({location: {latitude: lat, longitude: long}});
+            
+            
 
-            var assembly = participants[i].assembly;
+            var id_assembly = participants[i].id_assembly;
             var title = participants[i].title;
-            assemblyTable.push({assembly,title});
+            console.log(id_assembly);
+            
+            assemblyTable.push({id_assembly,title});
         }
     }
-    
-    /*positions.push({location: {latitude: 45.782019, longitude: 4.872554}});
-    positions.push({location: {latitude: 45.781980, longitude: 4.872514}});
-    positions.push({location: {latitude: 45.782039, longitude: 4.872470}});
-    positions.push({location: {latitude: 45.782048, longitude: 4.872501}});
-    positions.push({location: {latitude: 45.781048, longitude: 4.872501}});
-    positions.push({location: {latitude: 45.781108, longitude: 4.872500}});
-    positions.push({location: {latitude: 45.781008, longitude: 4.872504}});
-    positions.push({location: {latitude: 45.782039, longitude: 4.862470}});
-    
-    
-    assemblyTable.push(5);
-    assemblyTable.push(5);
-    assemblyTable.push(1);
-    assemblyTable.push(5);
-    assemblyTable.push(0);
-    assemblyTable.push(4);
-    assemblyTable.push(5);
-    assemblyTable.push(5);
-    assemblyTable.push(2);
-    assemblyTable.push(5);
-    */
 }
 
 function getLocation() {
@@ -89,6 +73,7 @@ function getAssemblyUser()
     }).done(function (data) {
         console.log(data);
         theAssembly = data.Assembly;
+
     });
 }
 
@@ -98,10 +83,6 @@ var longitude;
 
 function newAssembly() {
     document.getElementById("createAssembly").style.display = "block";
-}
-
-function closeCreate() {
-    document.getElementById("createAssembly").style.display = "none";
 }
 
 
@@ -131,12 +112,17 @@ function createAssembly() {
                 console.log("Error while sending  assembly request");
             }
         }).done(function (data) {
-            var reponse = data.createAssembly;
-            if (reponse.created === "true") {
+            
+            if(data.created == true)
+            {
+                theAssembly = data.Assembly;
+                assemblyInterested.set(theAssembly.id_assembly,theAssembly);
                 document.getElementById("createAssembly").style.display = "none";
             } else {
-                $('#message').text("Ups we didn't succed to verify rally creation");
+                $('#message').text("Ups we didn't succed to verify assembly creation");
             }
+            
+            initButtons();
         });
     }
 }
@@ -226,10 +212,16 @@ function initButtons()
         rallyDiv.appendChild(createRallyDiv);
         rallyDiv.appendChild(joinRallyDiv);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(rallyDiv);
+ 
+        
+        
     }
 }
 function initMap(latitude, longitude, participants) {
     var location = {lat: latitude, lng: longitude};
+    
+   console.log(participants);
+    
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 19,
         scaleControl: false,
@@ -264,42 +256,6 @@ function initMap(latitude, longitude, participants) {
     initButtons();
 }
 
-/*var x = document.getElementById("demo");
- function getLocation() {
- if (navigator.geolocation) {
- navigator.geolocation.getCurrentPosition(showPosition);
- } else {
- x.innerHTML = "Geolocation is not supported by this browser.";
- }
- }
- 
- function showPosition(position) {
- x.innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
- }*/
-/**
- function NumberToIcon(number){
- switch(number){
- default:
- case 1 : return "red";
- case 2 : return "darkred";
- case 3 : return "orange";
- case 4 : return "green";
- case 5 : return "darkgreen";
- case 6 : return "blue";
- case 7 : return "purple";
- case 8 : return "darkpurple";    
- case 9 : return "cadetblue"; 
- }
- }
- 
- 
- 
- class cluster_position{
- constructor(latlng,cluster){
- this.latlng = latlng;
- this.cluster = cluster;        
- }
- }*/
 
 function dbscan() {
     var dbscanner = jDBSCAN().eps(0.05).minPts(1).distance('HAVERSINE').data(positions);
@@ -311,13 +267,15 @@ function dbscan() {
     var clusterUser = cluster[0];
     assemblyInterested = new Map();
     
+    console.log("uuuu", assemblyTable);
+    
     for (var i = 1; i < assemblyTable.length; i++)
     {
-        if(cluster[i] === clusterUser)
+        if(cluster[i] == clusterUser)
         {
-            if(!assemblyInterested.has(assemblyTable[i].assembly))
+            if(!assemblyInterested.has(assemblyTable[i].id_assembly))
             {
-                assemblyInterested.set(assemblyTable[i].assembly, assemblyTable[i]);
+                assemblyInterested.set(assemblyTable[i].id_assembly, assemblyTable[i]);
             }
         }
         
@@ -377,6 +335,7 @@ function attachPseudo(marker, pseudo) {
         map.setZoom(19);
         map.setCenter(marker.getPosition());
         infowindow.open(map, marker);
+
     });
 
     google.maps.event.addListener(map, 'click', function () {
