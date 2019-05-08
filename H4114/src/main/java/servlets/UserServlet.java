@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -55,6 +56,29 @@ public class UserServlet extends HttpServlet {
         User user;
         Participant participant;
         switch(action){
+            case "clearData":
+                user = (User)request.getSession().getAttribute("user");
+                Integer id = user.getId();
+                System.out.println("In Clear");
+                System.out.println(id);
+                try {
+                    conn = DBConnection.Connection();
+                    String sql="delete from participants where id_user = ? ";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setInt(1, id); 
+	            stmt.executeUpdate();
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                    Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                /*request.getSession().removeAttribute("user");*/
+                request.getSession().removeAttribute("participant");
+                break;
             case "connect":
             {
                 try {
@@ -70,12 +94,12 @@ public class UserServlet extends HttpServlet {
                     try (PrintWriter out = response.getWriter()) {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         if(user != null){
-                            
+                            /*
                             participant = Participant.GetParticipantUser(conn,user.getId());
                             if (participant != null)
                             {
                                 request.getSession().setAttribute("participant", participant);
-                            }
+                            }*/
                             
                             connect.addProperty("connect", "successful");
                             request.getSession().setAttribute("user", user);
@@ -228,7 +252,7 @@ public class UserServlet extends HttpServlet {
                     participant = (Participant) request.getSession().getAttribute("participant");
                     JsonObject reponse = new JsonObject();
                     JsonObject assembly = new JsonObject();
-                    
+                    System.out.println(participant);
                     if (participant != null)
                     {
                         reponse.addProperty("exist", true);
