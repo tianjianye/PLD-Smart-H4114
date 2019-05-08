@@ -58,46 +58,38 @@ function setPosition(position) {
     longitude = position.coords.longitude;
     
     $.ajax({
-            url: './UserServlet',
-            method: 'POST',
-            data: {
-                action: 'getParticipants',
-            },
-            dataType: 'json',
-            error: function () {
-                alert("Error while sending new request");
-            }
-        }).done(function (data) {
-            var participants = data.Participants;
-            getAssemblyUser();
-            initMap(latitude, longitude, participants);
-            
-            
-           
-             
-        });
-        
-        
-    
+        url: './UserServlet',
+        method: 'POST',
+        data: {
+            action: 'getParticipants',
+        },
+        dataType: 'json',
+        error: function () {
+            alert("Error while sending new request");
+        }
+    }).done(function (data) {
+        var participants = data.Participants;
+        getAssemblyUser();
+        initMap(latitude, longitude, participants);
+    });
 }
 
 function getAssemblyUser()
 {
     $.ajax({
-            url: './UserServlet',
-            method: 'POST',
-            data: {
-                action: 'getAssemblySession',
-            },
-            dataType: 'json',
-            error: function () {
-                alert("Error while sending new request");
-            }
-        }).done(function (data) {
-            console.log(data);
-            theAssembly = data.Assembly;
-             
-        });
+        url: './UserServlet',
+        method: 'POST',
+        data: {
+            action: 'getAssemblySession',
+        },
+        dataType: 'json',
+        error: function () {
+            alert("Error while sending new request");
+        }
+    }).done(function (data) {
+        console.log(data);
+        theAssembly = data.Assembly;
+    });
 }
 
 var latitude;
@@ -105,17 +97,11 @@ var longitude;
 //var user = getQueryVariable("user");
 
 function newAssembly() {
-
-
     document.getElementById("createAssembly").style.display = "block";
-
 }
 
 function closeCreate() {
-
-
     document.getElementById("createAssembly").style.display = "none";
-
 }
 
 
@@ -240,16 +226,10 @@ function initButtons()
         rallyDiv.appendChild(createRallyDiv);
         rallyDiv.appendChild(joinRallyDiv);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(rallyDiv);
- 
-        
-        
     }
 }
 function initMap(latitude, longitude, participants) {
     var location = {lat: latitude, lng: longitude};
-    
-   
-    
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 19,
         scaleControl: false,
@@ -333,7 +313,7 @@ function dbscan() {
     
     for (var i = 1; i < assemblyTable.length; i++)
     {
-        if(cluster[i] == clusterUser)
+        if(cluster[i] === clusterUser)
         {
             if(!assemblyInterested.has(assemblyTable[i].assembly))
             {
@@ -397,7 +377,6 @@ function attachPseudo(marker, pseudo) {
         map.setZoom(19);
         map.setCenter(marker.getPosition());
         infowindow.open(map, marker);
-
     });
 
     google.maps.event.addListener(map, 'click', function () {
