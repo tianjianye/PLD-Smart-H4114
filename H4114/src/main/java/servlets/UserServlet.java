@@ -307,7 +307,7 @@ public class UserServlet extends HttpServlet {
                         JsonObject parti =new JsonObject();
                         
                         parti.addProperty("pseudo", pseudoU);
-                        parti.addProperty("status", statusU >= 1);
+                        parti.addProperty("status", statusU);
                         getPseudo.add("participate", parti);
                         
                         out.println(gson.toJson(getPseudo));
@@ -320,7 +320,7 @@ public class UserServlet extends HttpServlet {
                         JsonObject parti =new JsonObject();
                         
                         parti.addProperty("pseudo", pseudoU);
-                        parti.addProperty("status", false);
+                        parti.addProperty("status", -1);
                         getPseudo.add("participate", parti);
                         
                         out.println(gson.toJson(getPseudo));
