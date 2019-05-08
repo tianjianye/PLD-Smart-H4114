@@ -7,7 +7,7 @@ var socketListen;
 var pcListen;
 var listenName;
 
-const configurationListen = {iceServers: [{urls: 'turn:192.168.1.102:3478',credential: 'test',
+const configurationListen = {iceServers: [{urls: '10.43.2.185:3478',credential: 'test',
     username: 'test'}]};
 
 function setLocalAndSendMessage(sessionDescription) {
@@ -34,7 +34,7 @@ function stopReceiver() {
 
 function connectListen(number, name){
     listenName = name;
-    socketListen = new WebSocket("ws://192.168.137.1:8084/H4114/video/" + number + "/listen/" + name);
+    socketListen = new WebSocket("wss://192.168.137.1:8443/H4114/video/" + number + "/listen/" + name);
     socketListen.onopen = function (event) {
         identity = 'receiver';
         console.log("/!\\ Connexion serveur");
