@@ -61,6 +61,7 @@ public class ParticipantServlet extends HttpServlet {
                 JsonObject jsonResponse = new JsonObject();
                 HashMap<String, Boolean> rooms = ServerEndPoint.getServerEndPointState();
                 HashMap<String, Set <ServerEndPoint>> persons = ServerEndPoint.getServerEndPoints();
+                HashMap<String, ServerEndPoint> starters = ServerEndPoint.getServerEndPointStart();
                 JsonArray jsonListe = new JsonArray();
                 if(!rooms.entrySet().isEmpty()){
                     for (Map.Entry<String, Boolean> entry : rooms.entrySet()) {
@@ -68,6 +69,7 @@ public class ParticipantServlet extends HttpServlet {
                             JsonObject json = new JsonObject();
                             json.addProperty("num", entry.getKey());
                             json.addProperty("person", persons.get(entry.getKey()).size());
+                            json.addProperty("starter", starters.get(entry.getKey()).getName());
                             jsonListe.add(json);
                         }
                     }
