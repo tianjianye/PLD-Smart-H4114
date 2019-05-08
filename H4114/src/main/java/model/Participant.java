@@ -135,7 +135,7 @@ public class Participant {
             Integer idU =  rs.getInt("id_user");
             User user = User.getUser(conn, idU);
             Integer idA = rs.getInt("id_assembly");
-            Assembly assembly = Assembly.getAssembly(conn, idU);
+            Assembly assembly = Assembly.getAssembly(conn, idA);
             int status =  rs.getInt("status");
             double latitude =  rs.getDouble("latitude");
             double longitude =  rs.getDouble("longitude");
@@ -145,6 +145,33 @@ public class Participant {
         }
 
         return participants;
+    }
+    
+    public static Participant GetParticipantUser(Connection conn, Integer idUser) throws SQLException {
+       
+        String sql="select * from participants where id_user = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);   
+        stmt.setInt(1, idUser);      
+        ResultSet rs = stmt.executeQuery();
+
+        if(rs.next())
+        {
+            
+            Integer idP = rs.getInt("id_participant");
+            Integer idU =  rs.getInt("id_user");
+            User user = User.getUser(conn, idU);
+            Integer idA = rs.getInt("id_assembly");
+            Assembly assembly = Assembly.getAssembly(conn, idU);
+            int status =  rs.getInt("status");
+            double latitude =  rs.getDouble("latitude");
+            double longitude =  rs.getDouble("longitude");
+            
+            Participant participant = new Participant(user, assembly, latitude, longitude, status);
+            
+            return participant;
+        }
+
+        return null;
     }
 
     public static boolean Remove(Connection conn, String id) throws SQLException {

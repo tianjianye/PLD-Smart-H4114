@@ -64,11 +64,19 @@ public class UserServlet extends HttpServlet {
                     JsonObject connect=new JsonObject();
                     conn = DBConnection.Connection();
                     user = User.Connect(conn, email, password);
+                   
                     
                     
                     try (PrintWriter out = response.getWriter()) {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         if(user != null){
+                            /*
+                            participant = Participant.GetParticipantUser(conn,user.getId());
+                            if (participant != null)
+                            {
+                                request.getSession().setAttribute("participant", participant);
+                            }
+                            */
                             connect.addProperty("connect", "successful");
                             request.getSession().setAttribute("user", user);
                         }
@@ -275,16 +283,17 @@ public class UserServlet extends HttpServlet {
             }
             break;
             }
-            case "getPseudo":
+            case "getPseudos":
             {
-                JsonObject getPseudo =new JsonObject();
                 
-                user = (User) request.getSession().getAttribute("participant");
+                JsonObject getPseudo =new JsonObject();
+                System.out.println("---------------");
+                user = (User) request.getSession().getAttribute("user");
                 if (user == null)
                 {
                     break;
                 }
-                
+                System.out.println("ooook");
                 String pseudoU = user.getPseudo();
                 
                 participant = (Participant) request.getSession().getAttribute("participant");
@@ -310,7 +319,7 @@ public class UserServlet extends HttpServlet {
                         Gson gson=new GsonBuilder().setPrettyPrinting().create();
                         JsonObject parti =new JsonObject();
                         
-                        parti.addProperty("psuedo", pseudoU);
+                        parti.addProperty("pseudo", pseudoU);
                         parti.addProperty("status", false);
                         getPseudo.add("participate", parti);
                         

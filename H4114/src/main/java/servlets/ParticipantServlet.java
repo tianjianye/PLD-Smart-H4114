@@ -101,7 +101,7 @@ public class ParticipantServlet extends HttpServlet {
                     if (survey == null) {
                         break;
                     }
-                    System.err.println("askonfoaso");
+
                     String reponse = request.getParameter("response");
                     String address = survey.addAnswerVote(reponse);
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();

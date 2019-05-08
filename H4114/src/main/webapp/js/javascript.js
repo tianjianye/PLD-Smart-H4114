@@ -26,8 +26,10 @@ function changeToVote() {
     document.getElementById("vote").classList.add("active");
     $('#content').load("vote.html");
     
-    getAssemblies();
-    getParticipants();
+    getPseudos();
+    //getAssemblies();
+    //getParticipants();
+
 }
 
 function changeToAlert() {
@@ -52,6 +54,24 @@ function getAssemblies()
             }
         }).done(function (data) {
            
+        });
+}
+
+function getPseudos()
+{
+   
+    $.ajax({
+            url: './UserServlet',
+            method: 'POST',
+            data: {
+                action: 'getPseudos',
+            },
+            dataType: 'json',
+            error: function () {
+                console.log("getPseudos : Error while sending new request");
+            }
+        }).done(function (data) {
+            console.log(data);
         });
 }
 
