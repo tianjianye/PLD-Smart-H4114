@@ -7,7 +7,7 @@ var theAssembly = null;
 
 function createPositions(participants) {
 
-
+    positions= [];
     positions.push({location: {latitude: latitude, longitude: longitude}});
     if (participants)
     {
@@ -17,9 +17,13 @@ function createPositions(participants) {
             var lat = participants[i].latitude;
             var long = participants[i].longitude;
             positions.push({location: {latitude: lat, longitude: long}});
+            
+            
 
             var id_assembly = participants[i].id_assembly;
             var title = participants[i].title;
+            console.log(id_assembly);
+            
             assemblyTable.push({id_assembly,title});
         }
     }
@@ -263,42 +267,6 @@ function initMap(latitude, longitude, participants) {
     initButtons();
 }
 
-/*var x = document.getElementById("demo");
- function getLocation() {
- if (navigator.geolocation) {
- navigator.geolocation.getCurrentPosition(showPosition);
- } else {
- x.innerHTML = "Geolocation is not supported by this browser.";
- }
- }
- 
- function showPosition(position) {
- x.innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
- }*/
-/**
- function NumberToIcon(number){
- switch(number){
- default:
- case 1 : return "red";
- case 2 : return "darkred";
- case 3 : return "orange";
- case 4 : return "green";
- case 5 : return "darkgreen";
- case 6 : return "blue";
- case 7 : return "purple";
- case 8 : return "darkpurple";    
- case 9 : return "cadetblue"; 
- }
- }
- 
- 
- 
- class cluster_position{
- constructor(latlng,cluster){
- this.latlng = latlng;
- this.cluster = cluster;        
- }
- }*/
 
 function dbscan() {
     var dbscanner = jDBSCAN().eps(0.05).minPts(1).distance('HAVERSINE').data(positions);
@@ -309,6 +277,8 @@ function dbscan() {
     var nbicon = 4;
     var clusterUser = cluster[0];
     assemblyInterested = new Map();
+    
+    console.log("uuuu", assemblyTable);
     
     for (var i = 1; i < assemblyTable.length; i++)
     {

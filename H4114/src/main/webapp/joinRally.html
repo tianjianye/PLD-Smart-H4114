@@ -56,7 +56,7 @@ $(document).ready(function () {
         var radioItem = document.createElement('input');
         radioItem.setAttribute("type", "radio");
         radioItem.setAttribute("name", "rallies");
-        radioItem.setAttribute("value", assembly.assembly);
+        radioItem.setAttribute("value", assembly.id_assembly);
         radioItem.addEventListener("click",function(){
             $("#join").show();
         });

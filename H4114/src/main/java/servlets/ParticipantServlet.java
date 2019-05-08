@@ -106,13 +106,21 @@ public class ParticipantServlet extends HttpServlet {
                     }
 
                     String reponse = request.getParameter("response");
-                    String address = survey.addAnswerVote(reponse);
+                    String address = survey.addAnswerVote(reponse, participant);
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     JsonObject vote = new JsonObject();
-                    vote.addProperty("address", address);
+                    if (address.isEmpty())
+                    {
+                        vote.addProperty("alreadyVote", true);
+                    }
+                    else
+                    {
+                        vote.addProperty("alreadyVote", false);
+                    }
+                    
                     out.println(gson.toJson(vote));
 
-                    request.getSession().setAttribute("addressVote", address);
+                    //request.getSession().setAttribute("addressVote", address);
 
                 } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                     Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
