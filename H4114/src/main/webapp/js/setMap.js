@@ -9,6 +9,12 @@ function createPositions(participants) {
 
     positions= [];
     positions.push({location: {latitude: latitude, longitude: longitude}});
+    
+    var id_assembly = participants[0].id_assembly;
+    var title = participants[0].title;
+    assemblyTable.push({id_assembly,title});
+            
+    
     if (participants)
     {
         for (var i = 0; i< participants.length; i++)
@@ -277,6 +283,10 @@ function dbscan() {
     var nbicon = 4;
     var clusterUser = cluster[0];
     assemblyInterested = new Map();
+    if (assemblyTable.length == 1)
+    {
+        
+    }
     
     console.log("uuuu", assemblyTable);
     

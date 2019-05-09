@@ -5,7 +5,7 @@
     <div id="errorMsg"></div>
 </div>
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script>
     var Survey = null;
     var voted = false;
@@ -48,7 +48,12 @@
             sendButton.onclick = function(){
                 voted = true;
                 var radioValue = $("input[name='voteChoices']:checked").val();
-                console.log(radioValue);
+                updateSurvey();
+                setTimeout(function()
+                {
+                    updateSurvey();
+                }, parseInt(Survey.duration)-500);
+               
                 if(radioValue){
                     $.ajax({
                         url: './ParticipantServlet',
