@@ -5,6 +5,7 @@
  */
 package service;
 
+import init.CreateTableSQL;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -14,9 +15,9 @@ public class DBConnection {
         Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
         Connection DBconn = DriverManager.getConnection(dbURL);
         if(DBconn.isValid(10)){
-            CreateTableSQL.DropAllTables(DBconn);
-            CreateTableSQL.CreateTable(DBconn);
+            //CreateTableSQL.DropAllTables(DBconn);
+            CreateTableSQL.CreateTables(DBconn);
         }
         return DBconn;
     } 
-}    	
+}
