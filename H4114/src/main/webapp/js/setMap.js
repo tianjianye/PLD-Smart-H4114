@@ -109,7 +109,11 @@ function createAssembly() {
     $('#message').text("");
     var title = $('#title').val();
     var description = $('#description').val();
-    var radio = $('#radio').val();
+    if (title == "")
+    {
+        return;
+    }
+    var radio = 5;
     var colour = $('#colour').val();
     if (false) { //Verify whether there are errors
         $('#message').text("Failed");
