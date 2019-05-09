@@ -44,7 +44,7 @@ public class CreateTableSQL {
     public static void CreateUsers(Connection conn) throws SQLException{
         Statement stmt = conn.createStatement();
          String sql = "CREATE TABLE USERS ( ID_USER INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
-                 + "EMAIL VARCHAR(255) NOT NULL, PSEUDO VARCHAR(255) NOT NULL, PASSWORD VARCHAR(255) NOT NULL,PRIMARY KEY (ID_USER));";
+                 + "EMAIL VARCHAR(255) NOT NULL, PSEUDO VARCHAR(255) NOT NULL, PASSWORD VARCHAR(255) NOT NULL,PRIMARY KEY (ID_USER))";
          stmt.execute(sql);
             /*PreparedStatement preparedStatement = conn.prepareStatement(sql);   
             preparedStatement.executeUpdate();*/
@@ -53,7 +53,7 @@ public class CreateTableSQL {
         Statement stmt = conn.createStatement();
          String sql = "CREATE TABLE ASSEMBLIES( ID_ASSEMBLY INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
                  + "TITLE VARCHAR(255) NOT NULL,DESCRIPTION VARCHAR(255) NOT NULL, DATE_TIME VARCHAR(255) NOT NULL, RADIO INT NOT NULL, "
-                 + "COLOUR VARCHAR(255) NOT NULL, LATITUDE DOUBLE NOT NULL, LONGITUDE DOUBLE NOT NULL, PRIMARY KEY (ID_ASSEMBLY));";
+                 + "COLOUR VARCHAR(255) NOT NULL, LATITUDE DOUBLE NOT NULL, LONGITUDE DOUBLE NOT NULL, PRIMARY KEY (ID_ASSEMBLY))";
          stmt.execute(sql);
           //  PreparedStatement preparedStatement = conn.prepareStatement(sql);   
             //preparedStatement.executeUpdate();
@@ -63,7 +63,7 @@ public class CreateTableSQL {
          String sql = "CREATE TABLE PARTICIPANTS( ID_PARTICIPANT INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
                  + "ID_USER INT NOT NULL UNIQUE,ID_ASSEMBLY INT NOT NULL, STATUS INT NOT NULL, LATITUDE DOUBLE NOT NULL, "
                  + "LONGITUDE DOUBLE NOT NULL,PRIMARY KEY (ID_PARTICIPANT),FOREIGN KEY (ID_USER) REFERENCES USERS(ID_USER),"
-                 + "FOREIGN KEY (ID_ASSEMBLY) REFERENCES ASSEMBLIES(ID_ASSEMBLY));";
+                 + "FOREIGN KEY (ID_ASSEMBLY) REFERENCES ASSEMBLIES(ID_ASSEMBLY))";
         stmt.execute(sql);            
         //PreparedStatement preparedStatement = conn.prepareStatement(sql);   
                     //preparedStatement.executeUpdate();
@@ -71,7 +71,7 @@ public class CreateTableSQL {
     public static void CreateSurveys(Connection conn) throws SQLException{
          Statement stmt = conn.createStatement();
          String sql = "CREATE TABLE SURVEYS( ID_SURVEY INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
-                 + "QUESTION VARCHAR(255) NOT NULL ,CHOICES VARCHAR(255) NOT NULL,DURATION INT NO";
+                 + "QUESTION VARCHAR(255) NOT NULL ,CHOICES VARCHAR(255) NOT NULL,DURATION INT NOT NULL, PRIMARY KEY(ID_SURVEY))";
          stmt.execute(sql); 
             //PreparedStatement preparedStatement = conn.prepareStatement(sql);   
             //preparedStatement.executeUpdate();
