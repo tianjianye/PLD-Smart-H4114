@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Connection;
 public class DBConnection {
     public static Connection Connection() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException{
-        String dbURL  = "jdbc:derby://localhost:1527/tpsmart;create=true;user=tpsmart;password=tpsmart";
+        String dbURL  = "jdbc:derby://localhost:1527/tpsmart;user=tpsmart;password=tpsmart";
         Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
         Connection DBconn = DriverManager.getConnection(dbURL);
        return DBconn;
