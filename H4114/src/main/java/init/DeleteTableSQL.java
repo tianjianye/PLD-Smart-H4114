@@ -26,12 +26,11 @@ import service.DBConnection;
  */
 public class DeleteTableSQL {
     public static void DeleteTables(Connection conn) throws SQLException{
-        DeleteUsers(conn);
-        DeleteAssemblies(conn);
-        DeleteParticipants(conn);
         DeleteSurveys(conn);
+        DeleteParticipants(conn);
+        DeleteAssemblies(conn);
+        DeleteUsers(conn);
     }
-        
     public static void DeleteUsers(Connection conn) throws SQLException{
         if(existe(conn,"USERS")){
             Statement stmt = conn.createStatement();
@@ -70,7 +69,6 @@ public class DeleteTableSQL {
             Logger.getLogger(CreateTableSQL.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
     public static boolean existe(Connection connection, String nomTable) throws SQLException{
 	boolean existe;
 	DatabaseMetaData dmd = connection.getMetaData();
