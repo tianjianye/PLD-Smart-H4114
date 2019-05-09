@@ -262,13 +262,46 @@ function initMap(latitude, longitude, participants) {
         map: map,
         icon: {url: "./icons/man-black-user.png"}
     });
+    
+    for (var i = 0; i < participants.length; i++) {
+   
+        var colour = participants[i].colour.toString();
+        var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + colour.slice(1),
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+        
+        markers[i] = new google.maps.Marker({
+            position: {lat: participants[i].latitude, lng:  participants[i].longitude},
+            map: map,
+            icon:pinImage,
+            strokeColor:participants[i].colour,
+
+        });
+        
+        var s = "u";
+        if (participants[i].status == 1)
+        {
+            s="<h4>&#x1F3A5;</h4>";
+        }
+        else if (participants[i].status == 2)
+        {
+            s="<h4>⚖</h4>";
+        }
+         console.log(s);
+            
+        attachPseudo(markers[i], "<div style='text-align:center'>"
+                +"<h3>"+participants[i].pseudo+ "</h3>"+ s +
+                participants[i].title+"</div>");
+        
+        
+    }
+    
     attachPseudo(marker0, "moi");
 
-    //afficher des icons avec la couleur selon leur groupe
+
     dbscan();
-    for (var i = 0; i < markers.length; ++i) {
-        attachPseudo(markers[i], "" + i + "");
-    }
+  
     
     initButtons();
 }
@@ -283,10 +316,7 @@ function dbscan() {
     var nbicon = 4;
     var clusterUser = cluster[0];
     assemblyInterested = new Map();
-    if (assemblyTable.length == 1)
-    {
-        
-    }
+
     
     console.log("uuuu", assemblyTable);
     
