@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.persistence.Id;
 
 /**
@@ -27,6 +28,22 @@ public class Participant {
     int status;
     double longitude;
     double latitude;
+    
+    // peut etre à enlever
+    private static HashMap<Integer, Participant> participants = new HashMap<Integer, Participant>();
+    
+    public HashMap<Integer, Participant> getParticipant() {
+        return participants;
+    }
+
+    public static void addSurvey(Integer idUser, Participant participant) {
+        participants.put(idUser, participant);
+    }
+    
+    public static void removeSurvey(Participant participant) {
+        int idUser = participant.getUser().getId();
+        participants.remove(idUser);
+    }
 
     public Participant(User user, Assembly assembly, double latitude, double longitude, int status) {
         this.status = status;
