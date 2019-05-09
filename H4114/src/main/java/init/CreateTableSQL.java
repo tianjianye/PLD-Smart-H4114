@@ -19,24 +19,6 @@ import service.DBConnection;
  * @author Arthur
  */
 public class CreateTableSQL {
-    public static void DropAllTables(Connection conn){
-        String sqlU="DROP TABLE USERS";
-        String sqlA="DROP TABLE ASSEMBLIES";
-        String sqlP="DROP TABLE PARTICIPANTS";
-        String sqlS="DROP TABLE SURVEYS";
-        try {
-            conn = DBConnection.Connection();
-            Statement stmt=conn.createStatement();
-            stmt.execute("DROP TABLE USERS");
-            stmt.execute("DROP TABLE ASSEMBLIES");
-            stmt.execute("DROP TABLE PARTICIPANTS");
-            stmt.execute("DROP TABLE SURVEYS");
-        } catch (ClassNotFoundException | SQLException | InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(CreateTableSQL.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-    }
     public static void CreateTables(Connection conn) throws SQLException{
         CreateUsers(conn);
         CreateAssemblies(conn);
