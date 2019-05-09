@@ -5,12 +5,6 @@
  */
 package init;
 
-import static init.CreateTableSQL.CreateAssemblies;
-import static init.CreateTableSQL.CreateParticipants;
-import static init.CreateTableSQL.CreateSurveys;
-import static init.CreateTableSQL.CreateTables;
-import static init.CreateTableSQL.CreateUsers;
-import static init.CreateTableSQL.existe;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
