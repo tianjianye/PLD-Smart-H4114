@@ -14,10 +14,6 @@ public class DBConnection {
         String dbURL  = "jdbc:derby://localhost:1527/tpsmart;create=true;user=tpsmart;password=tpsmart";
         Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
         Connection DBconn = DriverManager.getConnection(dbURL);
-        if(DBconn.isValid(10)){
-            //CreateTableSQL.DropAllTables(DBconn);
-            CreateTableSQL.CreateTables(DBconn);
-        }
-        return DBconn;
+       return DBconn;
     } 
 }
